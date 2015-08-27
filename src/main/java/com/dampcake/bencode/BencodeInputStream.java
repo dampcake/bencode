@@ -206,16 +206,16 @@ public class BencodeInputStream extends FilterInputStream {
     private Object readObject(int token) throws IOException {
         in.unread(token);
 
-        switch (typeForToken(token)) {
-            case STRING:
-                return readString();
-            case NUMBER:
-                return readNumber();
-            case LIST:
-                return readList();
-            case DICTIONARY:
-                return readDictionary();
-        }
+        Type type = typeForToken(token);
+
+        if (type == Type.STRING)
+            return readString();
+        if (type == Type.NUMBER)
+            return readNumber();
+        if (type == Type.LIST)
+            return readList();
+        if (type == Type.DICTIONARY)
+            return readDictionary();
 
         throw new InvalidObjectException("Unexpected token '" + new String(Character.toChars(token)) + "'");
     }
