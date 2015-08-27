@@ -28,7 +28,7 @@ final class TypeValidator implements Validator {
         this.type = type;
     }
 
-    public boolean validate(int token) {
+    public boolean validate(final int token) {
         return token == type;
     }
 }

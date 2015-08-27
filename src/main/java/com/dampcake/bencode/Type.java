@@ -41,7 +41,7 @@ public class Type<T> {
         this.validator = validator;
     }
 
-    boolean validate(int token) {
+    boolean validate(final int token) {
         return validator.validate(token);
     }
 

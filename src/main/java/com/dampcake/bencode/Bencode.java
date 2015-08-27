@@ -17,6 +17,9 @@ package com.dampcake.bencode;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Bencode encoder/decoder.
@@ -45,11 +48,35 @@ public final class Bencode {
     /** Separator between length and string */
     static final char SEPARATOR = ':';
 
+    private final Charset charset;
+
     /**
-     * Creates a new Bencoder.
+     * Create a new Bencoder using the default {@link Charset} (UTF-8)
      */
     public Bencode() {
+        this.charset = DEFAULT_CHARSET;
+    }
 
+    /**
+     * Creates a new Bencoder using the {@link Charset} passed for encoding/decoding.
+     *
+     * @param charset the {@link Charset} to use
+     *
+     * @throws NullPointerException if the {@link Charset} passed is null
+     */
+    public Bencode(final Charset charset) {
+        if (charset == null) throw new NullPointerException("charset cannot be null");
+
+        this.charset = charset;
+    }
+
+    /**
+     * Gets the Charset the coder was created with.
+     *
+     * @return the Charset of the coder
+     */
+    public Charset getCharset() {
+        return charset;
     }
 
     /**
@@ -59,25 +86,10 @@ public final class Bencode {
      *
      * @return the {@link Type} or {@link Type#UNKNOWN} if it cannot be determined
      *
-     * @throws NullPointerException if bytes or charset is null
+     * @throws NullPointerException if bytes is null
      * @throws BencodeException if an error occurs during detection
      */
-    public Type type(byte[] bytes) {
-        return type(bytes, DEFAULT_CHARSET);
-    }
-
-    /**
-     * Determines the first {@link Type} contained within the byte array.
-     *
-     * @param bytes the bytes to determine the {@link Type} for
-     * @param charset the {@link Charset} to use for decoding
-     *
-     * @return the {@link Type} or {@link Type#UNKNOWN} if it cannot be determined
-     *
-     * @throws NullPointerException if bytes or charset is null
-     * @throws BencodeException if an error occurs during detection
-     */
-    public Type type(byte[] bytes, Charset charset) {
+    public Type type(final byte[] bytes) {
         if (bytes == null) throw new NullPointerException("bytes cannot be null");
 
         BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset);
@@ -101,25 +113,8 @@ public final class Bencode {
      * @throws IllegalArgumentException if type is {@link Type#UNKNOWN}
      * @throws BencodeException if an error occurs during decoding
      */
-    public <T> T decode(byte[] bytes, Type<T> type) {
-        return decode(bytes, type, DEFAULT_CHARSET);
-    }
-
-    /**
-     * Decodes a bencode encoded byte array.
-     *
-     * @param bytes the bytes to decode
-     * @param type the {@link Type} to decode as
-     * @param charset the {@link Charset} to use for decoding
-     *
-     * @return the decoded object
-     *
-     * @throws NullPointerException if bytes, type or charset is null
-     * @throws IllegalArgumentException if type is {@link Type#UNKNOWN}
-     * @throws BencodeException if an error occurs during decoding
-     */
     @SuppressWarnings("unchecked")
-    public <T> T decode(byte[] bytes, Type<T> type, Charset charset) {
+    public <T> T decode(final byte[] bytes, final Type<T> type) {
         if (bytes == null) throw new NullPointerException("bytes cannot be null");
         if (type == null) throw new NullPointerException("type cannot be null");
         if (type == Type.UNKNOWN) throw new IllegalArgumentException("type cannot be UNKNOWN");
@@ -137,5 +132,116 @@ public final class Bencode {
         } catch (Throwable t) {
             throw new BencodeException("Exception thrown during decoding", t);
         }
+    }
+
+    /**
+     * Encodes the passed String.
+     *
+     * @param s the String to encode
+     *
+     * @throws NullPointerException if the String is null
+     */
+    public byte[] encode(final String s) {
+        return sEncode(s).getBytes(charset);
+    }
+
+    /**
+     * Encodes the passed Number.
+     *
+     * The number is converted to a Long, meaning any precision is lost as it not supported by the bencode spec.
+     *
+     * @param n the Number to encode
+     *
+     * @throws NullPointerException if the Number is null
+     */
+    public byte[] encode(final Number n) {
+        return sEncode(n).getBytes(charset);
+    }
+
+    /**
+     * Encodes the passed List.
+     *
+     * Data contained in the List is written as the correct type. Any {@link Iterable} is written as a List,
+     * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
+     * calling the {@link Object#toString()} method.
+     *
+     * @param l the List to encode
+     *
+     * @throws NullPointerException if the List is null
+     */
+    public byte[] encode(final Iterable<?> l) {
+        return sEncode(l).getBytes(charset);
+    }
+
+    /**
+     * Encodes the passed Dictionary.
+     *
+     * Data contained in the Dictionary is written as the correct type. Any {@link Iterable} is written as a List,
+     * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
+     * calling the {@link Object#toString()} method.
+     *
+     * @param m the Map to encode
+     *
+     * @throws NullPointerException if the Map is null
+     */
+    public byte[] encode(final Map<?, ?> m) {
+        return sEncode(m).getBytes(charset);
+    }
+
+    private static String sEncode(final String s) {
+        if (s == null) throw new NullPointerException("s cannot be null");
+
+        return String.format("%d%s%s", s.length(), SEPARATOR, s);
+    }
+
+    private static String sEncode(final Number n) {
+        if (n == null) throw new NullPointerException("n cannot be null");
+
+        return String.format("%s%d%s", NUMBER, n.longValue(), TERMINATOR);
+    }
+
+    private static String sEncode(final Iterable<?> l) {
+        if (l == null) throw new NullPointerException("l cannot be null");
+
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(LIST);
+        for (Object o : l)
+            buffer.append(sEncodeObject(o));
+        buffer.append(TERMINATOR);
+
+        return buffer.toString();
+    }
+
+    private static String sEncode(final Map<?, ?> m) {
+        if (m == null) throw new NullPointerException("m cannot be null");
+
+        Map<?, ?> map;
+        if (!(m instanceof SortedMap<?, ?>))
+            map = new TreeMap<Object, Object>(m);
+        else
+            map = m;
+
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(DICTIONARY);
+        for (Map.Entry<?, ?> e : map.entrySet()) {
+            buffer.append(sEncode(e.getKey().toString()));
+            buffer.append(sEncodeObject(e.getValue()));
+        }
+        buffer.append(TERMINATOR);
+
+        return buffer.toString();
+    }
+
+    private static String sEncodeObject(final Object o) {
+        if (o == null) throw new NullPointerException("Cannot write null objects");
+
+        if (o instanceof Number)
+            return sEncode((Number) o);
+        if (o instanceof Iterable<?>)
+            return sEncode((Iterable<?>) o);
+        if (o instanceof Map<?, ?>)
+            return sEncode((Map<?, ?>) o);
+
+        return sEncode(o.toString());
     }
 }
