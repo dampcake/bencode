@@ -21,5 +21,5 @@ package com.dampcake.bencode;
  * @author Adam Peck
  */
 interface Validator {
-    boolean validate(int token);
+    boolean validate(final int token);
 }

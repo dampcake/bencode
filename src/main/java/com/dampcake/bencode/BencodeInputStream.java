@@ -203,7 +203,7 @@ public class BencodeInputStream extends FilterInputStream {
         return map;
     }
 
-    private Object readObject(int token) throws IOException {
+    private Object readObject(final int token) throws IOException {
         in.unread(token);
 
         Type type = typeForToken(token);

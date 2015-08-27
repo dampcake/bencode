@@ -20,14 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import static com.dampcake.bencode.Bencode.DICTIONARY;
-import static com.dampcake.bencode.Bencode.LIST;
-import static com.dampcake.bencode.Bencode.NUMBER;
-import static com.dampcake.bencode.Bencode.SEPARATOR;
-import static com.dampcake.bencode.Bencode.TERMINATOR;
 
 /**
  * OutputStream for writing bencoded data.
@@ -37,6 +29,7 @@ import static com.dampcake.bencode.Bencode.TERMINATOR;
 public class BencodeOutputStream extends FilterOutputStream {
 
     private final Charset charset;
+    private final Bencode bencode;
 
     /**
      * Creates a new BencodeOutputStream that writes to the OutputStream passed and uses the Charset passed for encoding the data.
@@ -51,6 +44,7 @@ public class BencodeOutputStream extends FilterOutputStream {
 
         if (charset == null) throw new NullPointerException("charset cannot be null");
         this.charset = charset;
+        this.bencode = new Bencode(charset);
     }
 
     /**
@@ -76,10 +70,11 @@ public class BencodeOutputStream extends FilterOutputStream {
      *
      * @param s the String to write to the stream
      *
+     * @throws NullPointerException if the String is null
      * @throws IOException if the underlying stream throws
      */
-    public void writeString(String s) throws IOException {
-        write(encode(s).getBytes(getCharset()));
+    public void writeString(final String s) throws IOException {
+        write(bencode.encode(s));
     }
 
     /**
@@ -89,10 +84,11 @@ public class BencodeOutputStream extends FilterOutputStream {
      *
      * @param n the Number to write to the stream
      *
+     * @throws NullPointerException if the Number is null
      * @throws IOException if the underlying stream throws
      */
-    public void writeNumber(Number n) throws IOException {
-        write(encode(n).getBytes(getCharset()));
+    public void writeNumber(final Number n) throws IOException {
+        write(bencode.encode(n));
     }
 
     /**
@@ -104,10 +100,11 @@ public class BencodeOutputStream extends FilterOutputStream {
      *
      * @param l the List to write to the stream
      *
+     * @throws NullPointerException if the List is null
      * @throws IOException if the underlying stream throws
      */
-    public void writeList(Iterable<?> l) throws IOException {
-        write(encode(l).getBytes(getCharset()));
+    public void writeList(final Iterable<?> l) throws IOException {
+        write(bencode.encode(l));
     }
 
     /**
@@ -119,66 +116,10 @@ public class BencodeOutputStream extends FilterOutputStream {
      *
      * @param m the Map to write to the stream
      *
+     * @throws NullPointerException if the Map is null
      * @throws IOException if the underlying stream throws
      */
-    public void writeDictionary(Map<?, ?> m) throws IOException {
-        write(encode(m).getBytes(getCharset()));
-    }
-
-    private static String encode(final String s) {
-        if (s == null) throw new NullPointerException("s cannot be null");
-
-        return String.format("%d%s%s", s.length(), SEPARATOR, s);
-    }
-
-    private static String encode(final Number n) {
-        if (n == null) throw new NullPointerException("n cannot be null");
-
-        return String.format("%s%d%s", NUMBER, n.longValue(), TERMINATOR);
-    }
-
-    private static String encode(final Iterable<?> l) {
-        if (l == null) throw new NullPointerException("l cannot be null");
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(LIST);
-        for (Object o : l)
-            buffer.append(encodeObject(o));
-        buffer.append(TERMINATOR);
-
-        return buffer.toString();
-    }
-
-    private static String encode(final Map<?, ?> m) {
-        if (m == null) throw new NullPointerException("m cannot be null");
-
-        Map<?, ?> map;
-        if (!(m instanceof SortedMap<?, ?>))
-            map = new TreeMap<Object, Object>(m);
-        else
-            map = m;
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(DICTIONARY);
-        for (Map.Entry<?, ?> e : map.entrySet()) {
-            buffer.append(encode(e.getKey().toString()));
-            buffer.append(encodeObject(e.getValue()));
-        }
-        buffer.append(TERMINATOR);
-
-        return buffer.toString();
-    }
-
-    private static String encodeObject(Object o) {
-        if (o == null) throw new NullPointerException("Cannot write null objects");
-
-        if (o instanceof Number)
-            return encode((Number) o);
-        if (o instanceof Iterable<?>)
-            return encode((Iterable<?>) o);
-        if (o instanceof Map<?, ?>)
-            return encode((Map<?, ?>) o);
-
-        return encode(o.toString());
+    public void writeDictionary(final Map<?, ?> m) throws IOException {
+        write(bencode.encode(m));
     }
 }

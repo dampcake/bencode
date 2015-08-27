@@ -7,8 +7,11 @@ import org.junit.rules.ExpectedException;
 
 import java.io.EOFException;
 import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import static org.hamcrest.core.IsInstanceOf.any;
 import static org.junit.Assert.assertEquals;
@@ -29,6 +32,14 @@ public class BencodeTest {
     @Before
     public void setUp() {
         instance = new Bencode();
+    }
+
+    @Test
+    public void testConstructorNullCharset() {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("charset cannot be null");
+
+        new Bencode(null);
     }
 
     @Test
@@ -55,7 +66,7 @@ public class BencodeTest {
     public void testTypeUnknown() {
         assertSame(Type.UNKNOWN, instance.type("unknown".getBytes()));
     }
-    
+
     @Test
     public void testTypeEmpty() {
         exception.expect(BencodeException.class);
@@ -73,14 +84,6 @@ public class BencodeTest {
     }
 
     @Test
-    public void testTypeNullCharset() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("charset cannot be null");
-
-        instance.type(new byte[0], null);
-    }
-
-    @Test
     public void testDecodeNullBytes() {
         exception.expect(NullPointerException.class);
         exception.expectMessage("bytes cannot be null");
@@ -94,14 +97,6 @@ public class BencodeTest {
         exception.expectMessage("type cannot be null");
 
         instance.decode("12:Hello World!".getBytes(), null);
-    }
-
-    @Test
-    public void testDecodeNullTypeCharset() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("charset cannot be null");
-
-        instance.decode("12:Hello World!".getBytes(), Type.STRING, null);
     }
 
     @Test
@@ -251,5 +246,137 @@ public class BencodeTest {
         exception.expectCause(any(EOFException.class));
 
         instance.decode("d4:item5:test".getBytes(), Type.DICTIONARY);
+    }
+
+    @Test
+    public void testWriteString() throws Exception {
+        byte[] encoded = instance.encode("Hello World!");
+
+        assertEquals("12:Hello World!", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringEmpty() throws Exception {
+        byte[] encoded = instance.encode("");
+
+        assertEquals("0:", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringNull() throws Exception {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("s cannot be null");
+
+        instance.encode((String) null);
+    }
+
+    @Test
+    public void testWriteNumber() throws Exception {
+        byte[] encoded = instance.encode(123456);
+
+        assertEquals("i123456e", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteNumberDecimal() throws Exception {
+        byte[] encoded = instance.encode(123.456);
+
+        assertEquals("i123e", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteNumberNull() throws Exception {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("n cannot be null");
+
+        instance.encode((Number) null);
+    }
+
+    @Test
+    public void testWriteList() throws Exception {
+        byte[] encoded = instance.encode(new ArrayList<Object>() {{
+            add("Hello");
+            add("World!");
+            add(new ArrayList<Object>() {{
+                add(123);
+                add(456);
+            }});
+        }});
+
+        assertEquals("l5:Hello6:World!li123ei456eee", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteListEmpty() throws Exception {
+        byte[] encoded = instance.encode(new ArrayList<Object>());
+
+        assertEquals("le", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteListNullItem() throws Exception {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("Cannot write null objects");
+
+        instance.encode(new ArrayList<Object>() {{
+            add("Hello");
+            add("World!");
+            add(new ArrayList<Object>() {{
+                add(null);
+                add(456);
+            }});
+        }});
+    }
+
+    @Test
+    public void testWriteListNull() throws Exception {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("l cannot be null");
+
+        instance.encode((List) null);
+    }
+
+    @Test
+    public void testWriteDictionary() throws Exception {
+        byte[] encoded = instance.encode(new HashMap<Object, Object>() {{
+            put("string", "value");
+            put("number", 123456);
+            put("list", new ArrayList<Object>() {{
+                add("list-item-1");
+                add("list-item-2");
+            }});
+            put("dict", new ConcurrentSkipListMap() {{
+                put(123, "test");
+                put(456, "thing");
+            }});
+        }});
+
+        assertEquals("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee",
+                new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteDictionaryEmpty() throws Exception {
+        byte[] encoded = instance.encode(new HashMap<Object, Object>());
+
+        assertEquals("de", new String(encoded, instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteDictionaryKeyCastException() throws Exception {
+        exception.expect(ClassCastException.class);
+
+        instance.encode(new HashMap<Object, Object>() {{
+            put("string", "value");
+            put(123, "number-key");
+        }});
+    }
+
+    @Test
+    public void testWriteDictionaryNull() throws Exception {
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("m cannot be null");
+
+        instance.encode((Map) null);
     }
 }

@@ -22,7 +22,7 @@ package com.dampcake.bencode;
  */
 final class StringValidator implements Validator {
 
-    public boolean validate(int token) {
+    public boolean validate(final int token) {
         return Character.isDigit(token);
     }
 }
