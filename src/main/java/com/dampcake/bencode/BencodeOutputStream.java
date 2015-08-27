@@ -19,7 +19,6 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -107,7 +106,7 @@ public class BencodeOutputStream extends FilterOutputStream {
      *
      * @throws IOException if the underlying stream throws
      */
-    public void writeList(Collection<?> l) throws IOException {
+    public void writeList(Iterable<?> l) throws IOException {
         write(encode(l).getBytes(getCharset()));
     }
 
