@@ -15,22 +15,21 @@
  */
 package com.dampcake.bencode;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Data Types in bencode.
  *
  * @author Adam Peck
  */
-public enum Type {
-    /** String Type */
-    STRING(new StringValidator()),
-    /** Number Type */
-    NUMBER(new TypeValidator(Bencode.NUMBER)),
-    /** List Type */
-    LIST(new TypeValidator(Bencode.LIST)),
-    /** Dictionary Type */
-    DICTIONARY(new TypeValidator(Bencode.DICTIONARY)),
-    /** Unknown/Invalid Type */
-    UNKNOWN(new Validator() {
+public class Type<T> {
+
+    public static final Type<String> STRING = new Type<String>(new StringValidator());
+    public static final Type<Long> NUMBER = new Type<Long>(new TypeValidator(Bencode.NUMBER));
+    public static final Type<List<Object>> LIST = new Type<List<Object>>(new TypeValidator(Bencode.LIST));
+    public static final Type<Map<String, Object>> DICTIONARY = new Type<Map<String, Object>>(new TypeValidator(Bencode.DICTIONARY));
+    public static final Type<Void> UNKNOWN = new Type<Void>(new Validator() {
         public boolean validate(int token) {
             return false;
         }
@@ -44,5 +43,9 @@ public enum Type {
 
     boolean validate(int token) {
         return validator.validate(token);
+    }
+
+    public static Type[] values() {
+        return new Type[] { STRING, NUMBER, LIST, DICTIONARY, UNKNOWN };
     }
 }
