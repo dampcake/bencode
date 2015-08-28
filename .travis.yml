@@ -8,4 +8,4 @@ env:
 
 after_success:
   - mvn clean test cobertura:cobertura coveralls:report
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { python travis/addserver.py; mvn clean deploy --settings ~/.m2/mySettings.xml; };"
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { python addserver.py; mvn clean deploy --settings ~/.m2/mySettings.xml; };"
