@@ -15,7 +15,7 @@ class Assert {
             block.run();
             fail("No exception thrown");
         } catch (Throwable t) {
-            assertEquals("Unexpected exception thrown: "+ t.getClass() + "\n" + t.getMessage(), expected, t.getClass());
+            assertEquals("Unexpected exception thrown: " + t.getClass() + "\n" + t.getMessage(), expected, t.getClass());
         }
     }
 }

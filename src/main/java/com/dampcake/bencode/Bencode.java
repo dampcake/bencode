@@ -25,7 +25,6 @@ import java.util.TreeMap;
  * Bencode encoder/decoder.
  *
  * @author Adam Peck
- *
  * @since 1.1
  */
 public final class Bencode {
@@ -71,9 +70,9 @@ public final class Bencode {
     }
 
     /**
-     * Gets the Charset the coder was created with.
+     * Gets the {@link Charset} the coder was created with.
      *
-     * @return the Charset of the coder
+     * @return the {@link Charset} of the coder
      */
     public Charset getCharset() {
         return charset;
@@ -87,7 +86,7 @@ public final class Bencode {
      * @return the {@link Type} or {@link Type#UNKNOWN} if it cannot be determined
      *
      * @throws NullPointerException if bytes is null
-     * @throws BencodeException if an error occurs during detection
+     * @throws BencodeException     if an error occurs during detection
      */
     public Type type(final byte[] bytes) {
         if (bytes == null) throw new NullPointerException("bytes cannot be null");
@@ -105,13 +104,13 @@ public final class Bencode {
      * Decodes a bencode encoded byte array.
      *
      * @param bytes the bytes to decode
-     * @param type the {@link Type} to decode as
+     * @param type  the {@link Type} to decode as
      *
      * @return the decoded object
      *
-     * @throws NullPointerException if bytes or type is null
+     * @throws NullPointerException     if bytes or type is null
      * @throws IllegalArgumentException if type is {@link Type#UNKNOWN}
-     * @throws BencodeException if an error occurs during decoding
+     * @throws BencodeException         if an error occurs during decoding
      */
     @SuppressWarnings("unchecked")
     public <T> T decode(final byte[] bytes, final Type<T> type) {
@@ -135,32 +134,32 @@ public final class Bencode {
     }
 
     /**
-     * Encodes the passed String.
+     * Encodes the passed {@link String}.
      *
-     * @param s the String to encode
+     * @param s the {@link String} to encode
      *
-     * @throws NullPointerException if the String is null
+     * @throws NullPointerException if the {@link String} is null
      */
     public byte[] encode(final String s) {
         return sEncode(s).getBytes(charset);
     }
 
     /**
-     * Encodes the passed Number.
+     * Encodes the passed {@link Number}.
+     * <p>
+     * The number is converted to a {@link Long}, meaning any precision is lost as it not supported by the bencode spec.
      *
-     * The number is converted to a Long, meaning any precision is lost as it not supported by the bencode spec.
+     * @param n the {@link Number} to encode
      *
-     * @param n the Number to encode
-     *
-     * @throws NullPointerException if the Number is null
+     * @throws NullPointerException if the {@link Number} is null
      */
     public byte[] encode(final Number n) {
         return sEncode(n).getBytes(charset);
     }
 
     /**
-     * Encodes the passed List.
-     *
+     * Encodes the passed {@link Iterable} as a bencode List.
+     * <p>
      * Data contained in the List is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
@@ -174,8 +173,8 @@ public final class Bencode {
     }
 
     /**
-     * Encodes the passed Dictionary.
-     *
+     * Encodes the passed {@link Map} as a bencode Dictionary.
+     * <p>
      * Data contained in the Dictionary is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.

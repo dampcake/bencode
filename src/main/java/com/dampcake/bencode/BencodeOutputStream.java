@@ -32,12 +32,12 @@ public class BencodeOutputStream extends FilterOutputStream {
     private final Bencode bencode;
 
     /**
-     * Creates a new BencodeOutputStream that writes to the OutputStream passed and uses the Charset passed for encoding the data.
+     * Creates a new BencodeOutputStream that writes to the {@link OutputStream} passed and uses the {@link Charset} passed for encoding the data.
      *
-     * @param out the OutputStream to write to
-     * @param charset the Charset to use
+     * @param out     the {@link OutputStream} to write to
+     * @param charset the {@link Charset} to use
      *
-     * @throws NullPointerException if the Charset passed is null
+     * @throws NullPointerException if the {@link Charset} passed is null
      */
     public BencodeOutputStream(final OutputStream out, final Charset charset) {
         super(out);
@@ -48,18 +48,18 @@ public class BencodeOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Creates a new BencodeOutputStream that writes to the OutputStream passed and uses UTF-8 Charset for encoding the data.
+     * Creates a new BencodeOutputStream that writes to the {@link OutputStream} passed and uses UTF-8 {@link Charset} for encoding the data.
      *
-     * @param out the InputStream to read from
+     * @param out the {@link OutputStream} to write to
      */
     public BencodeOutputStream(final OutputStream out) {
         this(out, Bencode.DEFAULT_CHARSET);
     }
 
     /**
-     * Gets the Charset the stream was created with.
+     * Gets the {@link Charset} the stream was created with.
      *
-     * @return the Charset of the stream
+     * @return the {@link Charset} of the stream
      */
     public Charset getCharset() {
         return charset;
@@ -71,7 +71,7 @@ public class BencodeOutputStream extends FilterOutputStream {
      * @param s the String to write to the stream
      *
      * @throws NullPointerException if the String is null
-     * @throws IOException if the underlying stream throws
+     * @throws IOException          if the underlying stream throws
      */
     public void writeString(final String s) throws IOException {
         write(bencode.encode(s));
@@ -79,13 +79,13 @@ public class BencodeOutputStream extends FilterOutputStream {
 
     /**
      * Writes the passed Number to the stream.
-     *
+     * <p>
      * The number is converted to a Long, meaning any precision is lost as it not supported by the bencode spec.
      *
      * @param n the Number to write to the stream
      *
      * @throws NullPointerException if the Number is null
-     * @throws IOException if the underlying stream throws
+     * @throws IOException          if the underlying stream throws
      */
     public void writeNumber(final Number n) throws IOException {
         write(bencode.encode(n));
@@ -93,7 +93,7 @@ public class BencodeOutputStream extends FilterOutputStream {
 
     /**
      * Writes the passed List to the stream.
-     *
+     * <p>
      * Data contained in the List is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
@@ -101,7 +101,7 @@ public class BencodeOutputStream extends FilterOutputStream {
      * @param l the List to write to the stream
      *
      * @throws NullPointerException if the List is null
-     * @throws IOException if the underlying stream throws
+     * @throws IOException          if the underlying stream throws
      */
     public void writeList(final Iterable<?> l) throws IOException {
         write(bencode.encode(l));
@@ -109,7 +109,7 @@ public class BencodeOutputStream extends FilterOutputStream {
 
     /**
      * Writes the passed Dictionary to the stream.
-     *
+     * <p>
      * Data contained in the Dictionary is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
@@ -117,7 +117,7 @@ public class BencodeOutputStream extends FilterOutputStream {
      * @param m the Map to write to the stream
      *
      * @throws NullPointerException if the Map is null
-     * @throws IOException if the underlying stream throws
+     * @throws IOException          if the underlying stream throws
      */
     public void writeDictionary(final Map<?, ?> m) throws IOException {
         write(bencode.encode(m));

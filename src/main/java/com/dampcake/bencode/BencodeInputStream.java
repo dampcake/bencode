@@ -41,12 +41,12 @@ public class BencodeInputStream extends FilterInputStream {
     private final PushbackInputStream in;
 
     /**
-     * Creates a new BencodeInputStream that reads from the InputStream passed and uses the Charset passed for decoding the data.
+     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the {@link Charset} passed for decoding the data.
      *
-     * @param in the InputStream to read from
-     * @param charset the Charset to use
+     * @param in      the {@link InputStream} to read from
+     * @param charset the {@link Charset} to use
      *
-     * @throws NullPointerException if the Charset passed is null
+     * @throws NullPointerException if the {@link Charset} passed is null
      */
     public BencodeInputStream(final InputStream in, final Charset charset) {
         super(new PushbackInputStream(in));
@@ -57,18 +57,18 @@ public class BencodeInputStream extends FilterInputStream {
     }
 
     /**
-     * Creates a new BencodeInputStream that reads from the InputStream passed and uses the UTF-8 Charset for decoding the data.
+     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the UTF-8 {@link Charset} for decoding the data.
      *
-     * @param in the InputStream to read from
+     * @param in the {@link InputStream} to read from
      */
     public BencodeInputStream(final InputStream in) {
         this(in, Bencode.DEFAULT_CHARSET);
     }
 
     /**
-     * Gets the Charset the stream was created with.
+     * Gets the {@link Charset} the stream was created with.
      *
-     * @return the Charset of the stream
+     * @return the {@link Charset} of the stream
      */
     public Charset getCharset() {
         return charset;
@@ -81,13 +81,11 @@ public class BencodeInputStream extends FilterInputStream {
     }
 
     /**
-     * Peeks at the next Type.
+     * Peeks at the next {@link Type}.
      *
-     * @see Type
+     * @return the next {@link Type} available
      *
-     * @return the next Type available
-     *
-     * @throws IOException if the underlying stream throws
+     * @throws IOException  if the underlying stream throws
      * @throws EOFException if the end of the stream has been reached
      */
     public Type nextType() throws IOException {
@@ -111,8 +109,8 @@ public class BencodeInputStream extends FilterInputStream {
      *
      * @return the String read from the stream
      *
-     * @throws IOException if the underlying stream throws
-     * @throws EOFException if the end of the stream has been reached
+     * @throws IOException            if the underlying stream throws
+     * @throws EOFException           if the end of the stream has been reached
      * @throws InvalidObjectException if the next type in the stream is not a String
      */
     public String readString() throws IOException {
@@ -138,8 +136,8 @@ public class BencodeInputStream extends FilterInputStream {
      *
      * @return the Number read from the stream
      *
-     * @throws IOException if the underlying stream throws
-     * @throws EOFException if the end of the stream has been reached
+     * @throws IOException            if the underlying stream throws
+     * @throws EOFException           if the end of the stream has been reached
      * @throws InvalidObjectException if the next type in the stream is not a Number
      */
     public Long readNumber() throws IOException {
@@ -161,8 +159,8 @@ public class BencodeInputStream extends FilterInputStream {
      *
      * @return the List read from the stream
      *
-     * @throws IOException if the underlying stream throws
-     * @throws EOFException if the end of the stream has been reached
+     * @throws IOException            if the underlying stream throws
+     * @throws EOFException           if the end of the stream has been reached
      * @throws InvalidObjectException if the next type in the stream is not a List, or the list contains invalid types
      */
     public List<Object> readList() throws IOException {
@@ -184,8 +182,8 @@ public class BencodeInputStream extends FilterInputStream {
      *
      * @return the Dictionary read from the stream
      *
-     * @throws IOException if the underlying stream throws
-     * @throws EOFException if the end of the stream has been reached
+     * @throws IOException            if the underlying stream throws
+     * @throws EOFException           if the end of the stream has been reached
      * @throws InvalidObjectException if the next type in the stream is not a Dictionary, or the list contains invalid types
      */
     public Map<String, Object> readDictionary() throws IOException {
