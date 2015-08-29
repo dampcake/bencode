@@ -315,8 +315,8 @@ public class BencodeTest {
 
     @Test
     public void testWriteListNullItem() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("Cannot write null objects");
+        exception.expect(BencodeException.class);
+        exception.expectCause(any(NullPointerException.class));
 
         instance.encode(new ArrayList<Object>() {{
             add("Hello");
@@ -364,7 +364,8 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionaryKeyCastException() throws Exception {
-        exception.expect(ClassCastException.class);
+        exception.expect(BencodeException.class);
+        exception.expectCause(any(ClassCastException.class));
 
         instance.encode(new HashMap<Object, Object>() {{
             put("string", "value");
