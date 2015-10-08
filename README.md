@@ -14,7 +14,7 @@ Requires JDK 1.5 or higher
 [Bencode Wikipedia](https://en.wikipedia.org/wiki/Bencode)
 
 ## Javadoc
-http://dampcake.github.io/gson-immutable
+http://dampcake.github.io/bencode
 
 ## Usage
 
