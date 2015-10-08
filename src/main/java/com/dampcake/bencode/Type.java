@@ -37,7 +37,7 @@ public class Type<T> {
 
     private final Validator validator;
 
-    Type(final Validator validator) {
+    private Type(final Validator validator) {
         this.validator = validator;
     }
 
