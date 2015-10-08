@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.EOFException;
 import java.io.InvalidObjectException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,13 @@ public class BencodeTest {
         exception.expectMessage("charset cannot be null");
 
         new Bencode(null);
+    }
+
+    @Test
+    public void testConstructorWithCharset() {
+        Bencode bencode = new Bencode(Charset.forName("US-ASCII"));
+
+        assertEquals(bencode.getCharset(), Charset.forName("US-ASCII"));
     }
 
     @Test
