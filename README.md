@@ -23,16 +23,47 @@ http://dampcake.github.io/bencode
 <dependency>
     <groupId>com.dampcake</groupId>
     <artifactId>bencode</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile 'com.dampcake:bencode:1.0'
+compile 'com.dampcake:bencode:1.1'
 ```
 
 ### Examples
+
+#### Bencode Data
+```java
+Bencode bencode = new Bencode();
+byte[] encoded = bencode.encode(new HashMap<Object, Object>() {{
+    put("string", "value");
+    put("number", 123456);
+    put("list", new ArrayList<Object>() {{
+        add("list-item-1");
+        add("list-item-2");
+    }});
+    put("dict", new ConcurrentSkipListMap() {{
+        put(123, "test");
+        put(456, "thing");
+    }});
+}});
+
+System.out.println(new String(out.toByteArray(), bencode.getCharset()));
+```
+
+Outputs: ```d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee```
+
+#### Decode Bencoded Data:
+```java
+Bencode bencode = new Bencode();
+Map<String, Object> dict = bencode.decode("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee".getBytes(), Type.DICTIONARY);
+
+System.out.println(dict);
+```
+
+Outputs: ```{dict={123=test, 456=thing}, list=[list-item-1, list-item-2], number=123456, string=value}```
 
 #### Write bencoded data to a Stream:
 ```java
