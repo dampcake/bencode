@@ -6,6 +6,5 @@ env:
     - SONATYPE_USERNAME=dampcake
     - secure: "gUGEdxgjX5Rldx/L0kRwwnOUYPRH4EdysWZ9A8ocdsBCWmwyblwpdhL4o5iIEUr6SLUgoyfuGSHREFp73XYj9J4xd8vmPinIbY1osWBySI6tmHUk1YuYOI9R7nx7kALpyds0HE4VKV2ST+xLEwPhir+0O0yKZauvE2gCFHjEhI8z1QnOAS3jS8q95gLz3OaOHKnRqEI+6QlUEvu0+qjCRu30jS43nwPu2Pau55H+sbU36VSekFsJv9Ee4z7aYLrS2+lH8jHYHDcUz+qhCW35lT1M7+4V72a/1Zt1anRsPfNcnfXwyC48Ylsu7IBh1mKWdBPES+O1vnl9Hl6q5wGMzmc14vJxk8FU3YyAOj4VitixQHbafgFYsSy/wyWbwqNDSJwa6NKj32gNh/Fv5wgOmMGyLZkQdhTn0zWpj4H6hVR/pwHs8kJW93AFl9jE+rexRBUu6KiOU5kJoFeuakXyfOy+flS//YWYZ+AzaSAgWgD5SFduRpcKyI3EdxUC4Y6cjOCP/N8+3MMZY7MfS1WFaYjggck2/A+X/nv+9B9XXuXpYO7s+MJqfr7hAf78/S20uNHr4hFh/5oY7YP/1NJJ77Zztm/iYnF+HA5ZraijQF31B1PPuSDRuKLRipEmA0fu+smMXXDJTbOmFQcuO065Vz1mSZaChiCskCTMa3K+p9o="
 
-after_success:
-  - mvn clean test cobertura:cobertura coveralls:report
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { python addserver.py; mvn clean deploy --settings ~/.m2/mySettings.xml; };"
+script: mvn clean cobertura:cobertura coveralls:report
+after_success: "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn clean deploy --settings travis-settings.xml -DskipTests=true; };"
