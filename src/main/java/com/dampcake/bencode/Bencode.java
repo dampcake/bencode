@@ -200,7 +200,7 @@ public final class Bencode {
 
     private byte[] encode(final Object o, final Type type) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        BencodeOutputStream bencode = new BencodeOutputStream(out);
+        BencodeOutputStream bencode = new BencodeOutputStream(out, charset);
 
         try {
             if (type == Type.STRING)
