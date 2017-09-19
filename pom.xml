@@ -3,7 +3,7 @@
 
   <groupId>com.dampcake</groupId>
   <artifactId>bencode</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.1.1</version>
   <packaging>jar</packaging>
 
   <name>bencode</name>
@@ -23,7 +23,7 @@
     <connection>scm:git:git@github.com:dampcake/bencode.git</connection>
     <developerConnection>scm:git:git@github.com:dampcake/bencode.git</developerConnection>
     <url>git@github.com:dampcake/bencode.git</url>
-    <tag>HEAD</tag>
+    <tag>bencode-1.1.1</tag>
   </scm>
 
   <issueManagement>
