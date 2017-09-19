@@ -23,13 +23,13 @@ http://dampcake.github.io/bencode
 <dependency>
     <groupId>com.dampcake</groupId>
     <artifactId>bencode</artifactId>
-    <version>1.1</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile 'com.dampcake:bencode:1.1'
+compile 'com.dampcake:bencode:1.1.1'
 ```
 
 ### Examples
