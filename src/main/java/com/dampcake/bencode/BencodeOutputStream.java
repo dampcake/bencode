@@ -126,13 +126,13 @@ public class BencodeOutputStream extends FilterOutputStream {
     private static String encode(final String s) {
         if (s == null) throw new NullPointerException("s cannot be null");
 
-        return String.format("%d%s%s", s.length(), Bencode.SEPARATOR, s);
+        return String.format("%s%s%s", Integer.toString(s.length()), Bencode.SEPARATOR, s);
     }
 
     private static String encode(final Number n) {
         if (n == null) throw new NullPointerException("n cannot be null");
 
-        return String.format("%s%d%s", Bencode.NUMBER, n.longValue(), Bencode.TERMINATOR);
+        return String.format("%s%s%s", Bencode.NUMBER, Long.toString(n.longValue()), Bencode.TERMINATOR);
     }
 
     private static String encode(final Iterable<?> l) {
