@@ -19,6 +19,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -126,13 +127,13 @@ public class BencodeOutputStream extends FilterOutputStream {
     private static String encode(final String s) {
         if (s == null) throw new NullPointerException("s cannot be null");
 
-        return String.format("%s%s%s", Integer.toString(s.length()), Bencode.SEPARATOR, s);
+        return String.format(Locale.ENGLISH, "%d%s%s", s.length(), Bencode.SEPARATOR, s);
     }
 
     private static String encode(final Number n) {
         if (n == null) throw new NullPointerException("n cannot be null");
 
-        return String.format("%s%s%s", Bencode.NUMBER, Long.toString(n.longValue()), Bencode.TERMINATOR);
+        return String.format(Locale.ENGLISH, "%s%d%s", Bencode.NUMBER, n.longValue(), Bencode.TERMINATOR);
     }
 
     private static String encode(final Iterable<?> l) {
