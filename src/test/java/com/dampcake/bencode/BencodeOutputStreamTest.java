@@ -1,17 +1,11 @@
 package com.dampcake.bencode;
 
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static com.dampcake.bencode.Assert.assertThrows;
@@ -22,35 +16,13 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Adam Peck
  */
-@RunWith(Parameterized.class)
 public class BencodeOutputStreamTest {
-
-    private static Locale startLocale = Locale.getDefault();
-
-    @Parameterized.Parameter
-    public Locale testLocale;
-
-    @AfterClass
-    public static void restore() throws Exception {
-        Locale.setDefault(startLocale);
-    }
-
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> data() {
-        LinkedList<Object[]> res = new LinkedList<Object[]>();
-        for (Locale locale : Locale.getAvailableLocales()) {
-            res.add(new Object[] {locale});
-        }
-        return res;
-    }
 
     private ByteArrayOutputStream out;
     private BencodeOutputStream instance;
 
     @Before
     public void setUp() {
-        Locale.setDefault(testLocale);
-
         out = new ByteArrayOutputStream();
         instance = new BencodeOutputStream(out);
     }
