@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static org.hamcrest.core.IsInstanceOf.any;
@@ -346,7 +347,7 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionary() throws Exception {
-        byte[] encoded = instance.encode(new HashMap<Object, Object>() {{
+        byte[] encoded = instance.encode(new TreeMap<Object, Object>() {{
             put("string", "value");
             put("number", 123456);
             put("list", new ArrayList<Object>() {{
@@ -372,10 +373,9 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionaryKeyCastException() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(ClassCastException.class));
+        exception.expect(any(ClassCastException.class));
 
-        instance.encode(new HashMap<Object, Object>() {{
+        instance.encode(new TreeMap<Object, Object>() {{
             put("string", "value");
             put(123, "number-key");
         }});

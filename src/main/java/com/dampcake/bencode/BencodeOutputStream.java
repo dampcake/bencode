@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * OutputStream for writing bencoded data.
@@ -157,14 +155,8 @@ public class BencodeOutputStream extends FilterOutputStream {
         return buffer.toString();
     }
 
-    private static String encode(final Map<?, ?> m) {
-        if (m == null) throw new NullPointerException("m cannot be null");
-
-        Map<?, ?> map;
-        if (!(m instanceof SortedMap<?, ?>))
-            map = new TreeMap<Object, Object>(m);
-        else
-            map = m;
+    private static String encode(final Map<?, ?> map) {
+        if (map == null) throw new NullPointerException("m cannot be null");
 
         StringBuilder buffer = new StringBuilder();
         buffer.append(Bencode.DICTIONARY);

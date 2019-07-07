@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static com.dampcake.bencode.Assert.assertThrows;
@@ -140,7 +141,7 @@ public class BencodeOutputStreamTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testWriteDictionary() throws Exception {
-        instance.writeDictionary(new HashMap<Object, Object>() {{
+        instance.writeDictionary(new TreeMap<Object, Object>() {{
             put("string", "value");
             put("number", 123456);
             put("list", new ArrayList<Object>() {{
@@ -168,7 +169,7 @@ public class BencodeOutputStreamTest {
     public void testWriteDictionaryKeyCastException() throws Exception {
         assertThrows(ClassCastException.class, new Runnable() {
             public void run() throws Exception {
-                instance.writeDictionary(new HashMap<Object, Object>() {{
+                instance.writeDictionary(new TreeMap<Object, Object>() {{
                     put("string", "value");
                     put(123, "number-key");
                 }});

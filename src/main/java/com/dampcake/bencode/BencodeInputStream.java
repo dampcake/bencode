@@ -23,9 +23,9 @@ import java.io.InvalidObjectException;
 import java.io.PushbackInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * InputStream for reading bencoded data.
@@ -190,7 +190,7 @@ public class BencodeInputStream extends FilterInputStream {
         int token = in.read();
         validateToken(token, Type.DICTIONARY);
 
-        Map<String, Object> map = new TreeMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         while ((token = in.read()) != Bencode.TERMINATOR) {
             checkEOF(token);
 
