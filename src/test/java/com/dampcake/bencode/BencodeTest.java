@@ -108,6 +108,14 @@ public class BencodeTest {
     }
 
     @Test
+    public void testDecodeUnknownType() {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("type cannot be UNKNOWN");
+
+        instance.decode("12:Hello World!".getBytes(), Type.UNKNOWN);
+    }
+
+    @Test
     public void testDecodeString() {
         String decoded = instance.decode("12:Hello World!".getBytes(), Type.STRING);
 
