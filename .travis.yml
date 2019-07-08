@@ -10,12 +10,7 @@ env:
     - SONATYPE_USERNAME=dampcake
     - secure: "u2uHxfAewnSb5LDVl64KAIfhvOqYc2wwRsI4/a7LPOwRxYG8m5AjLKd2Di4W6uOGakBky+PBpFvOBxILyk7T7D06b8j89vWPNX1Apn4DgCkASDYnhwzRClNtBDWvocx+IVeZ8m9PNGlGu349qCBOelWRdDmZj9Ilx+GzMMikR+ndK3sXVLP+HEwNaIYuFnryOUW+InOgU9ZAnEqKKhviDjop9ovwfFtN7sGeyrvKNnxsVDE9z18RL8vfL9gNCA5FGf49VPY/JXFIWG2MxbIQzuYK5+Zh8my8N6Y3a5JZdSwUfFmwU3yBuhSm+girCpX+b9MtMMOWuHY8c7Zz6vpLZSRl5dgf5/CyE4GHCv5OJt+2s1VEt0M2SPW13Hyawkc2WCsSqfUqJ37Cw8FqMyB9VldwObM7vYhqEpoqwelMY/Rumx/sn4SZVpyHq9G2Cw/65FynaGiMft9/oSuzsXHdvPAo0qjPpWGceMkwT9/HZP/c9FdRCjTLVKwdeI1ig4JMV2O0NBWpH0MNIIeeopLzuFaHOal9MRaBeBXNKLzUGqUQlbfRG6fX3gedk8Hw2NPaZa6siZUa78Ui8PKib75rjzM6Mwk5BN+PROKjESsJGmzzOpkpAhf8JjcTS8Pc7lkU4bDhkd/NnB5gpr2sgFKppQYJb15xYX3sVsixQ35oNUU="
 
-# TODO fix jdk 11 build
-matrix:
-  allow_failures:
-    - jdk: openjdk11
-
-script: mvn clean cobertura:cobertura coveralls:report
+script: mvn clean test jacoco:report coveralls:report
 
 deploy:
   - provider: script

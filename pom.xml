@@ -85,7 +85,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -107,7 +107,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.8.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -116,7 +116,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -129,7 +129,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.1</version>
+        <version>3.1.1</version>
         <configuration>
           <show>public</show>
           <nohelp>true</nohelp>
@@ -148,30 +148,35 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <format>xml</format>
-        </configuration>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.4</version>
+        <executions>
+          <execution>
+              <id>prepare-agent</id>
+              <goals>
+                  <goal>prepare-agent</goal>
+              </goals>
+          </execution>
+      </executions>
       </plugin>
       <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>4.3.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.2</version>
+        <version>2.5.3</version>
       </plugin>
 
       <!-- Publish Javadoc using: 'mvn clean javadoc:javadoc scm-publish:publish-scm' -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-scm-publish-plugin</artifactId>
-        <version>1.1</version>
+        <version>3.0.0</version>
         <configuration>
           <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
           <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
