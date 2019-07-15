@@ -7,7 +7,7 @@
 
 Bencode Input/Output Streams for Java
 
-Requires JDK 1.5 or higher
+Requires JDK 1.6 or higher
 
 [Bencode Spec](https://wiki.theory.org/BitTorrentSpecification#Bencoding)
 
@@ -23,13 +23,13 @@ http://dampcake.github.io/bencode
 <dependency>
     <groupId>com.dampcake</groupId>
     <artifactId>bencode</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile 'com.dampcake:bencode:1.2.1'
+compile 'com.dampcake:bencode:1.2.2'
 ```
 
 ### Examples
@@ -50,7 +50,7 @@ byte[] encoded = bencode.encode(new HashMap<Object, Object>() {{
     }});
 }});
 
-System.out.println(new String(out.toByteArray(), bencode.getCharset()));
+System.out.println(new String(encoded, bencode.getCharset()));
 ```
 
 Outputs: ```d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee```
