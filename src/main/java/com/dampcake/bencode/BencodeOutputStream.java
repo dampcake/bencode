@@ -156,7 +156,7 @@ public class BencodeOutputStream extends FilterOutputStream {
     }
 
     private static String encode(final Map<?, ?> map) {
-        if (map == null) throw new NullPointerException("m cannot be null");
+        if (map == null) throw new NullPointerException("map cannot be null");
 
         StringBuilder buffer = new StringBuilder();
         buffer.append(Bencode.DICTIONARY);
