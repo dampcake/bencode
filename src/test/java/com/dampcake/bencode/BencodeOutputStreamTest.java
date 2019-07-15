@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static com.dampcake.bencode.Assert.assertThrows;
@@ -140,7 +142,7 @@ public class BencodeOutputStreamTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testWriteDictionary() throws Exception {
-        instance.writeDictionary(new HashMap<Object, Object>() {{
+        instance.writeDictionary(new LinkedHashMap<Object, Object>() {{
             put("string", "value");
             put("number", 123456);
             put("list", new ArrayList<Object>() {{
@@ -153,7 +155,7 @@ public class BencodeOutputStreamTest {
             }});
         }});
 
-        assertEquals("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee",
+        assertEquals("d6:string5:value6:numberi123456e4:listl11:list-item-111:list-item-2e4:dictd3:1234:test3:4565:thingee",
                 new String(out.toByteArray(), instance.getCharset()));
     }
 
@@ -168,7 +170,7 @@ public class BencodeOutputStreamTest {
     public void testWriteDictionaryKeyCastException() throws Exception {
         assertThrows(ClassCastException.class, new Runnable() {
             public void run() throws Exception {
-                instance.writeDictionary(new HashMap<Object, Object>() {{
+                instance.writeDictionary(new TreeMap<Object, Object>() {{
                     put("string", "value");
                     put(123, "number-key");
                 }});

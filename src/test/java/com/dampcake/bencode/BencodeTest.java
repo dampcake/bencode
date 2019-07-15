@@ -10,8 +10,10 @@ import java.io.InvalidObjectException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static org.hamcrest.core.IsInstanceOf.any;
@@ -354,7 +356,7 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionary() throws Exception {
-        byte[] encoded = instance.encode(new HashMap<Object, Object>() {{
+        byte[] encoded = instance.encode(new LinkedHashMap<Object, Object>() {{
             put("string", "value");
             put("number", 123456);
             put("list", new ArrayList<Object>() {{
@@ -367,7 +369,7 @@ public class BencodeTest {
             }});
         }});
 
-        assertEquals("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee",
+        assertEquals("d6:string5:value6:numberi123456e4:listl11:list-item-111:list-item-2e4:dictd3:1234:test3:4565:thingee",
                 new String(encoded, instance.getCharset()));
     }
 
@@ -380,10 +382,9 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionaryKeyCastException() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(ClassCastException.class));
+        exception.expect(any(ClassCastException.class));
 
-        instance.encode(new HashMap<Object, Object>() {{
+        instance.encode(new TreeMap<Object, Object>() {{
             put("string", "value");
             put(123, "number-key");
         }});
