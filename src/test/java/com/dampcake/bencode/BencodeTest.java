@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.EOFException;
 import java.io.InvalidObjectException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +18,10 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import static org.hamcrest.core.IsInstanceOf.any;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -201,6 +204,23 @@ public class BencodeTest {
     }
 
     @Test
+    public void testDecodeListByteArray() throws Exception {
+        instance = new Bencode(true);
+        List<Object> decoded = instance.decode("l5:Hello6:World!li123ei456eeetesting".getBytes(), Type.LIST);
+
+        assertEquals(3, decoded.size());
+
+        assertThat(decoded.get(0), instanceOf(ByteBuffer.class));
+        assertEquals("Hello", new String(((ByteBuffer) decoded.get(0)).array()));
+        assertThat(decoded.get(1), instanceOf(ByteBuffer.class));
+        assertEquals("World!", new String(((ByteBuffer) decoded.get(1)).array()));
+
+        List<Object> list = (List<Object>) decoded.get(2);
+        assertEquals(123L, list.get(0));
+        assertEquals(456L, list.get(1));
+    }
+
+    @Test
     public void testDecodeListEmpty() throws Exception {
         List<Object> decoded = instance.decode("le123".getBytes(), Type.LIST);
 
@@ -241,6 +261,32 @@ public class BencodeTest {
         assertEquals(2, map.size());
         assertEquals("test", map.get("123"));
         assertEquals("thing", map.get("456"));
+    }
+
+    @Test
+    public void testDecodeDictionaryByteArray() throws Exception {
+        instance = new Bencode(true);
+        Map<String, Object> decoded = instance.decode("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee".getBytes(), Type.DICTIONARY);
+
+        assertEquals(4, decoded.size());
+
+        assertThat(decoded.get("string"), instanceOf(ByteBuffer.class));
+        assertEquals("value", new String(((ByteBuffer) decoded.get("string")).array()));
+        assertEquals(123456L, decoded.get("number"));
+
+        List<Object> list = (List<Object>) decoded.get("list");
+        assertEquals(2, list.size());
+        assertThat(list.get(0), instanceOf(ByteBuffer.class));
+        assertEquals("list-item-1", new String(((ByteBuffer) list.get(0)).array()));
+        assertThat(list.get(1), instanceOf(ByteBuffer.class));
+        assertEquals("list-item-2", new String(((ByteBuffer) list.get(1)).array()));
+
+        Map<String, Object> map = (Map<String, Object>) decoded.get("dict");
+        assertEquals(2, map.size());
+        assertThat(map.get("123"), instanceOf(ByteBuffer.class));
+        assertEquals("test", new String(((ByteBuffer) map.get("123")).array()));
+        assertThat(map.get("456"), instanceOf(ByteBuffer.class));
+        assertEquals("thing", new String(((ByteBuffer) map.get("456")).array()));
     }
 
     @Test

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.PushbackInputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,28 +39,55 @@ public class BencodeInputStream extends FilterInputStream {
     private static final int EOF = -1;
 
     private final Charset charset;
+    private final boolean useBytes;
     private final PushbackInputStream in;
 
     /**
-     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the {@link Charset} passed for decoding the data.
+     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the {@link Charset} passed for decoding the data
+     * and boolean passed to control String parsing.
      *
-     * @param in      the {@link InputStream} to read from
-     * @param charset the {@link Charset} to use
+     * If useBytes is false, then dictionary values that contain byte string data will be coerced to a {@link String}.
+     * if useBytes is true, then dictionary values that contain byte string data will be coerced to a {@link ByteBuffer}.
+     *
+     * @param in       the {@link InputStream} to read from
+     * @param charset  the {@link Charset} to use
+     * @param useBytes controls coercion of dictionary values
      *
      * @throws NullPointerException if the {@link Charset} passed is null
+     * 
+     * @since 1.3
      */
-    public BencodeInputStream(final InputStream in, final Charset charset) {
+    public BencodeInputStream(final InputStream in, final Charset charset, boolean useBytes) {
         super(new PushbackInputStream(in));
         this.in = (PushbackInputStream) super.in;
 
         if (charset == null) throw new NullPointerException("charset cannot be null");
         this.charset = charset;
+        this.useBytes = useBytes;
     }
 
     /**
-     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the UTF-8 {@link Charset} for decoding the data.
+     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the {@link Charset} passed for decoding the data
+     * and coerces dictionary values to a {@link String}.
+     *
+     * @param in      the {@link InputStream} to read from
+     * @param charset the {@link Charset} to use
+     *
+     * @throws NullPointerException if the {@link Charset} passed is null
+     *
+     * @see #BencodeInputStream(InputStream, Charset, boolean)
+     */
+    public BencodeInputStream(final InputStream in, final Charset charset) {
+        this(in, charset, false);
+    }
+
+    /**
+     * Creates a new BencodeInputStream that reads from the {@link InputStream} passed and uses the UTF-8 {@link Charset} for decoding the data
+     * and coerces dictionary values to a {@link String}.
      *
      * @param in the {@link InputStream} to read from
+     *
+     * @see #BencodeInputStream(InputStream, Charset, boolean)
      */
     public BencodeInputStream(final InputStream in) {
         this(in, Bencode.DEFAULT_CHARSET);
@@ -105,15 +133,34 @@ public class BencodeInputStream extends FilterInputStream {
     }
 
     /**
-     * Reads a String from the stream.
+     * Reads a {@link String} from the stream.
      *
-     * @return the String read from the stream
+     * @return the {@link String} read from the stream
      *
      * @throws IOException            if the underlying stream throws
      * @throws EOFException           if the end of the stream has been reached
      * @throws InvalidObjectException if the next type in the stream is not a String
      */
     public String readString() throws IOException {
+        return new String(readStringBytesInternal(), getCharset());
+    }
+
+    /**
+     * Reads a Byte String from the stream.
+     *
+     * @return the {@link ByteBuffer} read from the stream
+     *
+     * @throws IOException            if the underlying stream throws
+     * @throws EOFException           if the end of the stream has been reached
+     * @throws InvalidObjectException if the next type in the stream is not a String
+     * 
+     * @since 1.3
+     */
+    public ByteBuffer readStringBytes() throws IOException {
+        return ByteBuffer.wrap(readStringBytesInternal());
+    }
+
+    private byte[] readStringBytesInternal() throws IOException {
         int token = in.read();
         validateToken(token, Type.STRING);
 
@@ -128,7 +175,7 @@ public class BencodeInputStream extends FilterInputStream {
         int length = Integer.parseInt(buffer.toString());
         byte[] bytes = new byte[length];
         read(bytes);
-        return new String(bytes, getCharset());
+        return bytes;
     }
 
     /**
@@ -206,8 +253,10 @@ public class BencodeInputStream extends FilterInputStream {
 
         Type type = typeForToken(token);
 
-        if (type == Type.STRING)
+        if (type == Type.STRING && !useBytes)
             return readString();
+        if (type == Type.STRING && useBytes)
+            return readStringBytes();
         if (type == Type.NUMBER)
             return readNumber();
         if (type == Type.LIST)

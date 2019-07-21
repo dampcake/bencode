@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -57,7 +58,32 @@ public class BencodeOutputStreamTest {
     public void testWriteStringNull() throws Exception {
         assertThrows(NullPointerException.class, new Runnable() {
             public void run() throws Exception {
-                instance.writeString(null);
+                instance.writeString((String) null);
+            }
+        });
+
+        assertEquals(0, out.toByteArray().length);
+    }
+
+    @Test
+    public void testWriteStringByteArray() throws Exception {
+        instance.writeString(ByteBuffer.wrap("Hello World!".getBytes()));
+
+        assertEquals("12:Hello World!", new String(out.toByteArray(), instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringEmptyByteArray() throws Exception {
+        instance.writeString(ByteBuffer.wrap(new byte[0]));
+
+        assertEquals("0:", new String(out.toByteArray(), instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringNullByteArray() throws Exception {
+        assertThrows(NullPointerException.class, new Runnable() {
+            public void run() throws Exception {
+                instance.writeString((ByteBuffer) null);
             }
         });
 
@@ -93,7 +119,7 @@ public class BencodeOutputStreamTest {
     public void testWriteList() throws Exception {
         instance.writeList(new ArrayList<Object>() {{
             add("Hello");
-            add("World!");
+            add(ByteBuffer.wrap("World!".getBytes()));
             add(new ArrayList<Object>() {{
                 add(123);
                 add(456);
@@ -116,7 +142,7 @@ public class BencodeOutputStreamTest {
             public void run() throws Exception {
                 instance.writeList(new ArrayList<Object>() {{
                     add("Hello");
-                    add("World!");
+                    add(ByteBuffer.wrap("World!".getBytes()));
                     add(new ArrayList<Object>() {{
                         add(null);
                         add(456);
@@ -150,7 +176,7 @@ public class BencodeOutputStreamTest {
                 add("list-item-2");
             }});
             put("dict", new ConcurrentSkipListMap() {{
-                put(123, "test");
+                put(123, ByteBuffer.wrap("test".getBytes()));
                 put(456, "thing");
             }});
         }});

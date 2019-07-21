@@ -5,11 +5,14 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.InvalidObjectException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
 import static com.dampcake.bencode.Assert.assertThrows;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -22,7 +25,15 @@ public class BencodeInputStreamTest {
     private BencodeInputStream instance;
 
     private void instantiate(String s) {
-        instance = new BencodeInputStream(new ByteArrayInputStream(s.getBytes(Bencode.DEFAULT_CHARSET)));
+        instantiate(s, false);
+    }
+
+    private void instantiate(String s, boolean useBytes) {
+        instance = new BencodeInputStream(
+            new ByteArrayInputStream(s.getBytes(Bencode.DEFAULT_CHARSET)),
+            Bencode.DEFAULT_CHARSET,
+            useBytes
+        );
     }
 
     @Test
@@ -131,6 +142,61 @@ public class BencodeInputStreamTest {
     }
 
     @Test
+    public void testReadStringByteArray() throws Exception {
+        instantiate("12:Hello World!123");
+
+        assertEquals("Hello World!", new String(instance.readStringBytes().array()));
+        assertEquals(3, instance.available());
+    }
+
+    @Test
+    public void testReadStringEmptyByteArray() throws Exception {
+        instantiate("0:123");
+
+        assertEquals("", new String(instance.readStringBytes().array()));
+        assertEquals(3, instance.available());
+    }
+
+    @Test
+    public void testReadStringNaNByteArray() throws Exception {
+        instantiate("1c3:Testing");
+
+        assertThrows(InvalidObjectException.class, new Runnable() {
+            public void run() throws Exception {
+                instance.readStringBytes();
+            }
+        });
+
+        assertEquals(10, instance.available());
+    }
+
+    @Test
+    public void testReadStringEOFByteArray() throws Exception {
+        instantiate("123456");
+
+        assertThrows(EOFException.class, new Runnable() {
+            public void run() throws Exception {
+                instance.readStringBytes();
+            }
+        });
+
+        assertEquals(0, instance.available());
+    }
+
+    @Test
+    public void testReadStringEmptyStreamByteArray() throws Exception {
+        instantiate("");
+
+        assertThrows(EOFException.class, new Runnable() {
+            public void run() throws Exception {
+                instance.readStringBytes();
+            }
+        });
+
+        assertEquals(0, instance.available());
+    }
+
+    @Test
     public void testReadNumber() throws Exception {
         instantiate("i123456e123");
 
@@ -197,6 +263,27 @@ public class BencodeInputStreamTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testReadListBytes() throws Exception {
+        instantiate("l5:Hello6:World!li123ei456eeetesting", true);
+
+        List<Object> result = instance.readList();
+
+        assertEquals(3, result.size());
+
+        assertThat(result.get(0), instanceOf(ByteBuffer.class));
+        assertEquals("Hello", new String(((ByteBuffer) result.get(0)).array()));
+        assertThat(result.get(1), instanceOf(ByteBuffer.class));
+        assertEquals("World!", new String(((ByteBuffer) result.get(1)).array()));
+
+        List<Object> list = (List<Object>) result.get(2);
+        assertEquals(123L, list.get(0));
+        assertEquals(456L, list.get(1));
+
+        assertEquals(7, instance.available());
+    }
+
+    @Test
     public void testReadListEmpty() throws Exception {
         instantiate("le123");
 
@@ -251,6 +338,36 @@ public class BencodeInputStreamTest {
         assertEquals(2, map.size());
         assertEquals("test", map.get("123"));
         assertEquals("thing", map.get("456"));
+
+        assertEquals(0, instance.available());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testReadDictionaryByteArray() throws Exception {
+        instantiate("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee", true);
+
+        Map<String, Object> result = instance.readDictionary();
+
+        assertEquals(4, result.size());
+
+        assertThat(result.get("string"), instanceOf(ByteBuffer.class));
+        assertEquals("value", new String(((ByteBuffer) result.get("string")).array()));
+        assertEquals(123456L, result.get("number"));
+
+        List<Object> list = (List<Object>) result.get("list");
+        assertEquals(2, list.size());
+        assertThat(list.get(0), instanceOf(ByteBuffer.class));
+        assertEquals("list-item-1", new String(((ByteBuffer) list.get(0)).array()));
+        assertThat(list.get(1), instanceOf(ByteBuffer.class));
+        assertEquals("list-item-2", new String(((ByteBuffer) list.get(1)).array()));
+
+        Map<String, Object> map = (Map<String, Object>) result.get("dict");
+        assertEquals(2, map.size());
+        assertThat(map.get("123"), instanceOf(ByteBuffer.class));
+        assertEquals("test", new String(((ByteBuffer) map.get("123")).array()));
+        assertThat(map.get("456"), instanceOf(ByteBuffer.class));
+        assertEquals("thing", new String(((ByteBuffer) map.get("456")).array()));
 
         assertEquals(0, instance.available());
     }

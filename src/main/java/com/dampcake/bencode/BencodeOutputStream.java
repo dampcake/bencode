@@ -15,9 +15,11 @@
  */
 package com.dampcake.bencode;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -64,112 +66,139 @@ public class BencodeOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Writes the passed String to the stream.
+     * Writes the passed {@link String} to the stream.
      *
-     * @param s the String to write to the stream
+     * @param s the {@link String} to write to the stream
      *
      * @throws NullPointerException if the String is null
      * @throws IOException          if the underlying stream throws
      */
     public void writeString(final String s) throws IOException {
-        write(encode(s).getBytes(charset));
+        write(encode(s));
     }
 
     /**
-     * Writes the passed Number to the stream.
+     * Writes the passed {@link ByteBuffer} to the stream.
+     *
+     * @param buff the {@link ByteBuffer} to write to the stream
+     *
+     * @throws NullPointerException if the {@link ByteBuffer} is null
+     * @throws IOException          if the underlying stream throws
+     *
+     * @since 1.3
+     */
+    public void writeString(final ByteBuffer buff) throws IOException {
+        write(encode(buff.array()));
+    }
+
+    /**
+     * Writes the passed {@link Number} to the stream.
      * <p>
-     * The number is converted to a Long, meaning any precision is lost as it not supported by the bencode spec.
+     * The number is converted to a {@link Long}, meaning any precision is lost as it not supported by the bencode spec.
+     * </p>
+     * 
+     * @param n the {@link Number} to write to the stream
      *
-     * @param n the Number to write to the stream
-     *
-     * @throws NullPointerException if the Number is null
+     * @throws NullPointerException if the {@link Number} is null
      * @throws IOException          if the underlying stream throws
      */
     public void writeNumber(final Number n) throws IOException {
-        write(encode(n).getBytes(charset));
+        write(encode(n));
     }
 
     /**
-     * Writes the passed List to the stream.
+     * Writes the passed {@link Iterable} to the stream.
      * <p>
-     * Data contained in the List is written as the correct type. Any {@link Iterable} is written as a List,
+     * Data contained in the {@link Iterable} is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
      *
-     * @param l the List to write to the stream
+     * @param l the {@link Iterable} to write to the stream
      *
-     * @throws NullPointerException if the List is null
+     * @throws NullPointerException if the {@link Iterable} is null
      * @throws IOException          if the underlying stream throws
      */
     public void writeList(final Iterable<?> l) throws IOException {
-        write(encode(l).getBytes(charset));
+        write(encode(l));
     }
 
     /**
-     * Writes the passed Dictionary to the stream.
+     * Writes the passed {@link Map} to the stream.
      * <p>
-     * Data contained in the Dictionary is written as the correct type. Any {@link Iterable} is written as a List,
+     * Data contained in the {@link Map} is written as the correct type. Any {@link Iterable} is written as a List,
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
      *
-     * @param m the Map to write to the stream
+     * @param m the {@link Map} to write to the stream
      *
-     * @throws NullPointerException if the Map is null
+     * @throws NullPointerException if the {@link Map} is null
      * @throws IOException          if the underlying stream throws
      */
     public void writeDictionary(final Map<?, ?> m) throws IOException {
-        write(encode(m).getBytes(charset));
+        write(encode(m));
     }
 
-    private static String encode(final String s) {
+    private byte[] encode(final String s) throws IOException {
         if (s == null) throw new NullPointerException("s cannot be null");
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(s.length());
-        buffer.append(Bencode.SEPARATOR);
-        buffer.append(s);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(Integer.toString(s.length()).getBytes(charset));
+        buffer.write(Bencode.SEPARATOR);
+        buffer.write(s.getBytes(charset));
 
-        return buffer.toString();
+        return buffer.toByteArray();
     }
 
-    private static String encode(final Number n) {
+    private byte[] encode(final byte[] b) throws IOException {
+        if (b == null) throw new NullPointerException("b cannot be null");
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        buffer.write(Integer.toString(b.length).getBytes(charset));
+        buffer.write(Bencode.SEPARATOR);
+        buffer.write(b);
+
+        return buffer.toByteArray();
+    }
+
+    private byte[] encode(final Number n) throws IOException {
         if (n == null) throw new NullPointerException("n cannot be null");
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(Bencode.NUMBER);
-        buffer.append(n.longValue());
-        buffer.append(Bencode.TERMINATOR);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(Bencode.NUMBER);
+        buffer.write(Long.toString(n.longValue()).getBytes(charset));
+        buffer.write(Bencode.TERMINATOR);
 
-        return buffer.toString();
+        return buffer.toByteArray();
     }
 
-    private static String encode(final Iterable<?> l) {
+    private byte[] encode(final Iterable<?> l) throws IOException {
         if (l == null) throw new NullPointerException("l cannot be null");
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(Bencode.LIST);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(Bencode.LIST);
         for (Object o : l)
-            buffer.append(encodeObject(o));
-        buffer.append(Bencode.TERMINATOR);
+            buffer.write(encodeObject(o));
+        buffer.write(Bencode.TERMINATOR);
 
-        return buffer.toString();
+        return buffer.toByteArray();
     }
 
-    private static String encode(final Map<?, ?> map) {
+    private byte[] encode(final Map<?, ?> map) throws IOException {
         if (map == null) throw new NullPointerException("map cannot be null");
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(Bencode.DICTIONARY);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(Bencode.DICTIONARY);
         for (Map.Entry<?, ?> e : map.entrySet()) {
-            buffer.append(encode(e.getKey().toString()));
-            buffer.append(encodeObject(e.getValue()));
+            buffer.write(encode(e.getKey().toString()));
+            buffer.write(encodeObject(e.getValue()));
         }
-        buffer.append(Bencode.TERMINATOR);
+        buffer.write(Bencode.TERMINATOR);
 
-        return buffer.toString();
+        return buffer.toByteArray();
     }
 
-    private static String encodeObject(final Object o) {
+    private byte[] encodeObject(final Object o) throws IOException {
         if (o == null) throw new NullPointerException("Cannot write null objects");
 
         if (o instanceof Number)
@@ -178,6 +207,8 @@ public class BencodeOutputStream extends FilterOutputStream {
             return encode((Iterable<?>) o);
         if (o instanceof Map<?, ?>)
             return encode((Map<?, ?>) o);
+        if (o instanceof ByteBuffer)
+            return encode(((ByteBuffer) o).array());
 
         return encode(o.toString());
     }

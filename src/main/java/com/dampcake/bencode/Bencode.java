@@ -47,25 +47,59 @@ public final class Bencode {
     static final char SEPARATOR = ':';
 
     private final Charset charset;
+    private final boolean useBytes;
 
     /**
-     * Create a new Bencoder using the default {@link Charset} (UTF-8)
+     * Create a new Bencoder using the default {@link Charset} (UTF-8) and useBytes as false.
+     * 
+     * @see #Bencode(Charset, boolean)
      */
     public Bencode() {
-        this.charset = DEFAULT_CHARSET;
+        this(DEFAULT_CHARSET);
     }
 
     /**
-     * Creates a new Bencoder using the {@link Charset} passed for encoding/decoding.
+     * Creates a new Bencoder using the {@link Charset} passed for encoding/decoding and useBytes as false.
      *
      * @param charset the {@link Charset} to use
      *
      * @throws NullPointerException if the {@link Charset} passed is null
+     * 
+     * @see #Bencode(Charset, boolean)
      */
     public Bencode(final Charset charset) {
+        this(charset, false);
+    }
+
+    /**
+     * Creates a new Bencoder using the boolean passed to control String parsing.
+     *
+     * @param useBytes {@link #Bencode(Charset, boolean)} 
+     * 
+     * @since 1.3
+     */
+    public Bencode(final boolean useBytes) {
+        this(DEFAULT_CHARSET, useBytes);
+    }
+
+    /**
+     * Creates a new Bencoder using the {@link Charset} passed for encoding/decoding and boolean passed to control String parsing.
+     * 
+     * If useBytes is false, then dictionary values that contain byte string data will be coerced to a {@link String}.
+     * if useBytes is true, then dictionary values that contain byte string data will be coerced to a {@link java.nio.ByteBuffer}.
+     *
+     * @param charset the {@link Charset} to use
+     * @param useBytes true to have dictionary byte data to stay as bytes
+     *
+     * @throws NullPointerException if the {@link Charset} passed is null
+     * 
+     * @since 1.3
+     */
+    public Bencode(final Charset charset, final boolean useBytes) {
         if (charset == null) throw new NullPointerException("charset cannot be null");
 
         this.charset = charset;
+        this.useBytes = useBytes;
     }
 
     /**
@@ -90,7 +124,7 @@ public final class Bencode {
     public Type type(final byte[] bytes) {
         if (bytes == null) throw new NullPointerException("bytes cannot be null");
 
-        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset);
+        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes);
 
         try {
             return in.nextType();
@@ -102,6 +136,7 @@ public final class Bencode {
     /**
      * Decodes a bencode encoded byte array.
      *
+     * @param <T>   inferred from the {@link Type} parameter
      * @param bytes the bytes to decode
      * @param type  the {@link Type} to decode as
      *
@@ -117,7 +152,7 @@ public final class Bencode {
         if (type == null) throw new NullPointerException("type cannot be null");
         if (type == Type.UNKNOWN) throw new IllegalArgumentException("type cannot be UNKNOWN");
 
-        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset);
+        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes);
 
         try {
             if (type == Type.NUMBER)
@@ -137,6 +172,8 @@ public final class Bencode {
      *
      * @param s the {@link String} to encode
      *
+     * @return the encoded bytes
+     *
      * @throws NullPointerException if the {@link String} is null
      * @throws BencodeException     if an error occurs during encoding
      */
@@ -152,6 +189,8 @@ public final class Bencode {
      * The number is converted to a {@link Long}, meaning any precision is lost as it not supported by the bencode spec.
      *
      * @param n the {@link Number} to encode
+     *
+     * @return the encoded bytes
      *
      * @throws NullPointerException if the {@link Number} is null
      * @throws BencodeException     if an error occurs during encoding
@@ -169,7 +208,9 @@ public final class Bencode {
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
      *
-     * @param l the List to encode
+     * @param l the {@link Iterable} to encode
+     *
+     * @return the encoded bytes
      *
      * @throws NullPointerException if the List is null
      * @throws BencodeException     if an error occurs during encoding
@@ -187,7 +228,9 @@ public final class Bencode {
      * any {@link Number} as a Number, any {@link Map} as a Dictionary and any other {@link Object} is written as a String
      * calling the {@link Object#toString()} method.
      *
-     * @param m the Map to encode
+     * @param m the {@link Map} to encode
+     *
+     * @return the encoded bytes
      *
      * @throws NullPointerException if the Map is null
      * @throws BencodeException     if an error occurs during encoding
