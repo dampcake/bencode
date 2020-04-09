@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.PushbackInputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -198,7 +199,7 @@ public class BencodeInputStream extends FilterInputStream {
             buffer.append((char) token);
         }
 
-        return Long.parseLong(buffer.toString());
+        return new BigDecimal(buffer.toString()).longValue();
     }
 
     /**

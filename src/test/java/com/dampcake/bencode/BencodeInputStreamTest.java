@@ -244,6 +244,13 @@ public class BencodeInputStreamTest {
     }
 
     @Test
+    public void testReadNumberScientificNotation() throws Exception {
+        instantiate("i-2.9155148901435E+18e");
+
+        assertEquals(-2915514890143500000L, instance.readNumber().longValue());
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testReadList() throws Exception {
         instantiate("l5:Hello6:World!li123ei456eeetesting");
