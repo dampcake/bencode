@@ -115,8 +115,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <compilerArgument>-Xlint:unchecked</compilerArgument>
         </configuration>
       </plugin>
@@ -156,7 +156,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.4</version>
+        <version>0.8.6</version>
         <executions>
           <execution>
 						<goals>

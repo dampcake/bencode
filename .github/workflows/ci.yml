@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 8, 9, 10, 11, 12, 13, 14, 15 ]
+    env:
+      JAVA: ${{ matrix.java }}
+    name: Java ${{ matrix.java }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Test
+      run: mvn -B test jacoco:report
+    - uses: codecov/codecov-action@v1
+      with:
+        env_vars: JAVA
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    name: Deploy
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: 8
+    - name: Deploy
+      run: mvn -B clean deploy --settings ci-settings.xml -DskipTests
