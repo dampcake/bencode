@@ -38,4 +38,7 @@ jobs:
       with:
         java-version: 8
     - name: Deploy
+      env:
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       run: mvn -B clean deploy --settings ci-settings.xml -DskipTests
