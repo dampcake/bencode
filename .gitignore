@@ -7,8 +7,14 @@
 *.iml
 .idea/*
 
+# VSCode/Eclipse
+.settings
+.project
+.classpath
+.vscode
+
 # Maven
-target/*
+target
 
 # Package Files #
 *.jar
