@@ -7,7 +7,7 @@
 
 Bencode Input/Output Streams for Java
 
-Requires JDK 1.6 or higher
+Requires JDK 1.8 or higher
 
 [Bencode Spec](https://wiki.theory.org/BitTorrentSpecification#Bencoding)
 
