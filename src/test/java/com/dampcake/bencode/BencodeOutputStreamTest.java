@@ -181,7 +181,7 @@ public class BencodeOutputStreamTest {
             }});
         }});
 
-        assertEquals("d6:string5:value6:numberi123456e4:listl11:list-item-111:list-item-2e4:dictd3:1234:test3:4565:thingee",
+        assertEquals("d4:dictd3:1234:test3:4565:thinge4:listl11:list-item-111:list-item-2e6:numberi123456e6:string5:valuee",
                 new String(out.toByteArray(), instance.getCharset()));
     }
 

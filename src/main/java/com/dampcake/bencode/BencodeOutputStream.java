@@ -22,6 +22,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * OutputStream for writing bencoded data.
@@ -184,8 +186,14 @@ public class BencodeOutputStream extends FilterOutputStream {
         return buffer.toByteArray();
     }
 
-    private byte[] encode(final Map<?, ?> map) throws IOException {
-        if (map == null) throw new NullPointerException("map cannot be null");
+    private byte[] encode(final Map<?, ?> m) throws IOException {
+        if (m == null) throw new NullPointerException("m cannot be null");
+
+        Map<?, ?> map;
+        if (!(m instanceof SortedMap<?, ?>))
+            map = new TreeMap<>(m);
+        else
+            map = m;
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         buffer.write(Bencode.DICTIONARY);
