@@ -128,6 +128,13 @@ public class BencodeTest {
     }
 
     @Test
+    public void testDecodeStringMultiByteCodePoints() {
+        String decoded = instance.decode("7:Garçon".getBytes(), Type.STRING);
+
+        assertEquals("Garçon", decoded);
+    }
+
+    @Test
     public void testDecodeEmptyString() {
         String decoded = instance.decode("0:123".getBytes(), Type.STRING);
 
@@ -319,6 +326,12 @@ public class BencodeTest {
         assertEquals("12:Hello World!", new String(encoded, instance.getCharset()));
     }
 
+    @Test
+    public void testWriteStringMultiByteCodePoints() throws Exception {
+        byte[] encoded = instance.encode("Garçon");
+
+        assertEquals("7:Garçon", new String(encoded, instance.getCharset()));
+    }
     @Test
     public void testWriteStringEmpty() throws Exception {
         byte[] encoded = instance.encode("");

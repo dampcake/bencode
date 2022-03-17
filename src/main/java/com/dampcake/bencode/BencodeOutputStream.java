@@ -144,9 +144,10 @@ public class BencodeOutputStream extends FilterOutputStream {
         if (s == null) throw new NullPointerException("s cannot be null");
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        buffer.write(Integer.toString(s.length()).getBytes(charset));
+        byte[] bytes = s.getBytes(charset);
+        buffer.write(Integer.toString(bytes.length).getBytes(charset));
         buffer.write(Bencode.SEPARATOR);
-        buffer.write(s.getBytes(charset));
+        buffer.write(bytes);
 
         return buffer.toByteArray();
     }
