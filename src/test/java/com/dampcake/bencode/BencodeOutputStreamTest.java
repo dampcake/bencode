@@ -66,15 +66,29 @@ public class BencodeOutputStreamTest {
     }
 
     @Test
-    public void testWriteStringByteArray() throws Exception {
+    public void testWriteStringByteBuffer() throws Exception {
         instance.writeString(ByteBuffer.wrap("Hello World!".getBytes()));
 
         assertEquals("12:Hello World!", new String(out.toByteArray(), instance.getCharset()));
     }
 
     @Test
-    public void testWriteStringEmptyByteArray() throws Exception {
+    public void testWriteStringEmptyByteBuffer() throws Exception {
         instance.writeString(ByteBuffer.wrap(new byte[0]));
+
+        assertEquals("0:", new String(out.toByteArray(), instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringByteArray() throws Exception {
+        instance.writeString("Hello World!".getBytes());
+
+        assertEquals("12:Hello World!", new String(out.toByteArray(), instance.getCharset()));
+    }
+
+    @Test
+    public void testWriteStringEmptyByteArray() throws Exception {
+        instance.writeString(new byte[0]);
 
         assertEquals("0:", new String(out.toByteArray(), instance.getCharset()));
     }
@@ -124,9 +138,10 @@ public class BencodeOutputStreamTest {
                 add(123);
                 add(456);
             }});
+            add("Foo".getBytes());
         }});
 
-        assertEquals("l5:Hello6:World!li123ei456eee", new String(out.toByteArray(), instance.getCharset()));
+        assertEquals("l5:Hello6:World!li123ei456ee3:Fooe", new String(out.toByteArray(), instance.getCharset()));
     }
 
     @Test

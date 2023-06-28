@@ -94,6 +94,20 @@ public class BencodeOutputStream extends FilterOutputStream {
     }
 
     /**
+     * Writes the passed byte[] to the stream.
+     *
+     * @param array the byte[] to write to the stream
+     *
+     * @throws NullPointerException if the byte[] is null
+     * @throws IOException          if the underlying stream throws
+     *
+     * @since 1.4.1
+     */
+    public void writeString(final byte[] array) throws IOException {
+        write(encode(array));
+    }
+
+    /**
      * Writes the passed {@link Number} to the stream.
      * <p>
      * The number is converted to a {@link Long}, meaning any precision is lost as it not supported by the bencode spec.
@@ -218,6 +232,8 @@ public class BencodeOutputStream extends FilterOutputStream {
             return encode((Map<?, ?>) o);
         if (o instanceof ByteBuffer)
             return encode(((ByteBuffer) o).array());
+        if (o instanceof byte[])
+            return encode((byte[]) o);
 
         return encode(o.toString());
     }
