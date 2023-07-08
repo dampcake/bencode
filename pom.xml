@@ -189,7 +189,7 @@
           <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
           <content>${project.reporting.outputDirectory}/apidocs</content>
           <skipDeletedFiles>true</skipDeletedFiles>
-          <pubScmUrl>scm:git:git@github.com:dampcake/bencode.git</pubScmUrl>
+          <pubScmUrl>scm:git:https://github.com/dampcake/bencode.git</pubScmUrl>
           <!-- branch with static site on github-->
           <scmBranch>gh-pages</scmBranch>
         </configuration>
