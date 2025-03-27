@@ -1,9 +1,8 @@
 package com.dampcake.bencode;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.function.ThrowingRunnable;
 
 import java.io.EOFException;
 import java.io.InvalidObjectException;
@@ -17,11 +16,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import static org.hamcrest.core.IsInstanceOf.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -29,10 +28,6 @@ import static org.junit.Assert.assertTrue;
  */
 @SuppressWarnings("unchecked")
 public class BencodeTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     private Bencode instance;
 
     @Before
@@ -42,10 +37,8 @@ public class BencodeTest {
 
     @Test
     public void testConstructorNullCharset() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("charset cannot be null");
-
-        new Bencode(null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> new Bencode(null));
+        assertEquals("charset cannot be null", exception.getMessage());
     }
 
     @Test
@@ -82,42 +75,32 @@ public class BencodeTest {
 
     @Test
     public void testTypeEmpty() {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.type(new byte[0]);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.type(new byte[0]));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
     public void testTypeNullBytes() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("bytes cannot be null");
-
-        instance.type(null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.type(null));
+        assertEquals("bytes cannot be null", exception.getMessage());
     }
 
     @Test
     public void testDecodeNullBytes() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("bytes cannot be null");
-
-        instance.decode(null, Type.STRING);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.decode(null, Type.STRING));
+        assertEquals("bytes cannot be null", exception.getMessage());
     }
 
     @Test
     public void testDecodeNullType() {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("type cannot be null");
-
-        instance.decode("12:Hello World!".getBytes(), null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.decode("12:Hello World!".getBytes(), null));
+        assertEquals("type cannot be null", exception.getMessage());
     }
 
     @Test
     public void testDecodeUnknownType() {
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("type cannot be UNKNOWN");
-
-        instance.decode("12:Hello World!".getBytes(), Type.UNKNOWN);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> instance.decode("12:Hello World!".getBytes(), Type.UNKNOWN));
+        assertEquals("type cannot be UNKNOWN", exception.getMessage());
     }
 
     @Test
@@ -143,26 +126,20 @@ public class BencodeTest {
 
     @Test
     public void testDecodeStringNaN() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(InvalidObjectException.class));
-
-        instance.decode("1c3:Testing".getBytes(), Type.STRING);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("1c3:Testing".getBytes(), Type.STRING));
+        assertThat(exception.getCause(), instanceOf(InvalidObjectException.class));
     }
 
     @Test
     public void testDecodeStringEOF() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("123456".getBytes(), Type.STRING);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("123456".getBytes(), Type.STRING));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
     public void testDecodeStringEmpty() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("".getBytes(), Type.STRING);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("".getBytes(), Type.STRING));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
@@ -174,26 +151,20 @@ public class BencodeTest {
 
     @Test
     public void testDecodeNumberNaN() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(NumberFormatException.class));
-
-        instance.decode("i123cbve1".getBytes(), Type.NUMBER);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("i123cbve1".getBytes(), Type.NUMBER));
+        assertThat(exception.getCause(), instanceOf(NumberFormatException.class));
     }
 
     @Test
     public void testDecodeNumberEOF() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("i123".getBytes(), Type.NUMBER);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("i123".getBytes(), Type.NUMBER));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
     public void testDecodeNumberEmpty() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("".getBytes(), Type.NUMBER);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("".getBytes(), Type.NUMBER));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
@@ -236,18 +207,14 @@ public class BencodeTest {
 
     @Test
     public void testDecodeListInvalidItem() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(InvalidObjectException.class));
-
-        instance.decode("l2:Worlde".getBytes(), Type.LIST);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("l2:Worlde".getBytes(), Type.LIST));
+        assertThat(exception.getCause(), instanceOf(InvalidObjectException.class));
     }
 
     @Test
     public void testDecodeListEOF() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("l5:Hello".getBytes(), Type.LIST);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("l5:Hello".getBytes(), Type.LIST));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
@@ -268,6 +235,22 @@ public class BencodeTest {
         assertEquals(2, map.size());
         assertEquals("test", map.get("123"));
         assertEquals("thing", map.get("456"));
+    }
+
+    @Test
+    public void testDecodeDebianTracker() throws Exception {
+        Map<String, Object> decoded = instance.decode("d8:intervali900e5:peersld2:ip12:146.71.73.514:porti63853eeee".getBytes(), Type.DICTIONARY);
+
+        assertEquals(2, decoded.size());
+
+        assertEquals(900L, decoded.get("interval"));
+
+        List<Object> list = (List<Object>) decoded.get("peers");
+        assertEquals(1, list.size());
+
+        Map<String, Object> map = (Map<String, Object>) list.get(0);
+        assertEquals("146.71.73.51", map.get("ip"));
+        assertEquals(63853L, map.get("port"));
     }
 
     @Test
@@ -305,18 +288,14 @@ public class BencodeTest {
 
     @Test
     public void testDecodeDictionaryInvalidItem() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(InvalidObjectException.class));
-
-        instance.decode("d4:item5:value3:testing".getBytes(), Type.DICTIONARY);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("d4:item5:value3:testing".getBytes(), Type.DICTIONARY));
+        assertThat(exception.getCause(), instanceOf(InvalidObjectException.class));
     }
 
     @Test
     public void testDecodeDictionaryEOF() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(EOFException.class));
-
-        instance.decode("d4:item5:test".getBytes(), Type.DICTIONARY);
+        BencodeException exception = assertThrows(BencodeException.class, () -> instance.decode("d4:item5:test".getBytes(), Type.DICTIONARY));
+        assertThat(exception.getCause(), instanceOf(EOFException.class));
     }
 
     @Test
@@ -341,10 +320,8 @@ public class BencodeTest {
 
     @Test
     public void testWriteStringNull() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("s cannot be null");
-
-        instance.encode((String) null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.encode((String) null));
+        assertEquals("s cannot be null", exception.getMessage());
     }
 
     @Test
@@ -363,10 +340,8 @@ public class BencodeTest {
 
     @Test
     public void testWriteNumberNull() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("n cannot be null");
-
-        instance.encode((Number) null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.encode((Number) null));
+        assertEquals("n cannot be null", exception.getMessage());
     }
 
     @Test
@@ -392,10 +367,7 @@ public class BencodeTest {
 
     @Test
     public void testWriteListNullItem() throws Exception {
-        exception.expect(BencodeException.class);
-        exception.expectCause(any(NullPointerException.class));
-
-        instance.encode(new ArrayList<Object>() {{
+        ThrowingRunnable runnable = () -> instance.encode(new ArrayList<Object>() {{
             add("Hello");
             add("World!");
             add(new ArrayList<Object>() {{
@@ -403,14 +375,14 @@ public class BencodeTest {
                 add(456);
             }});
         }});
+        BencodeException exception = assertThrows(BencodeException.class, runnable);
+        assertThat(exception.getCause(), instanceOf(NullPointerException.class));
     }
 
     @Test
     public void testWriteListNull() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("l cannot be null");
-
-        instance.encode((List) null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.encode((List<?>) null));
+        assertEquals("l cannot be null", exception.getMessage());
     }
 
     @Test
@@ -422,7 +394,7 @@ public class BencodeTest {
                 add("list-item-1");
                 add("list-item-2");
             }});
-            put("dict", new ConcurrentSkipListMap() {{
+            put("dict", new ConcurrentSkipListMap<Integer, String>() {{
                 put(123, "test");
                 put(456, "thing");
             }});
@@ -441,19 +413,16 @@ public class BencodeTest {
 
     @Test
     public void testWriteDictionaryKeyCastException() throws Exception {
-        exception.expect(any(ClassCastException.class));
-
-        instance.encode(new TreeMap<Object, Object>() {{
+        ThrowingRunnable runnable = () -> instance.encode(new TreeMap<Object, Object>() {{
             put("string", "value");
             put(123, "number-key");
         }});
+        assertThrows(ClassCastException.class, runnable);
     }
 
     @Test
     public void testWriteDictionaryNull() throws Exception {
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("m cannot be null");
-
-        instance.encode((Map) null);
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> instance.encode((Map<?, ?>) null));
+        assertEquals("m cannot be null", exception.getMessage());
     }
 }
