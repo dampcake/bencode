@@ -124,9 +124,7 @@ public final class Bencode {
     public Type type(final byte[] bytes) {
         if (bytes == null) throw new NullPointerException("bytes cannot be null");
 
-        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes);
-
-        try {
+        try (BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes)) {
             return in.nextType();
         } catch (Throwable t) {
             throw new BencodeException("Exception thrown during type detection", t);
@@ -152,9 +150,7 @@ public final class Bencode {
         if (type == null) throw new NullPointerException("type cannot be null");
         if (type == Type.UNKNOWN) throw new IllegalArgumentException("type cannot be UNKNOWN");
 
-        BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes);
-
-        try {
+        try (BencodeInputStream in = new BencodeInputStream(new ByteArrayInputStream(bytes), charset, useBytes)) {
             if (type == Type.NUMBER)
                 return (T) in.readNumber();
             if (type == Type.LIST)
@@ -243,9 +239,8 @@ public final class Bencode {
 
     private byte[] encode(final Object o, final Type type) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        BencodeOutputStream bencode = new BencodeOutputStream(out, charset);
 
-        try {
+        try (BencodeOutputStream bencode = new BencodeOutputStream(out, charset)) {
             if (type == Type.STRING)
                 bencode.writeString((String) o);
             else if (type == Type.NUMBER)

@@ -37,11 +37,13 @@ public class BencodeInputStreamTest {
     }
 
     @Test
+    @SuppressWarnings("resource")
     public void testConstructorNullStream() throws Exception {
         new BencodeInputStream(null);
     }
 
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("resource")
     public void testConstructorNullCharset() throws Exception {
         new BencodeInputStream(new ByteArrayInputStream(new byte[0]), null);
     }
