@@ -31,11 +31,13 @@ public class BencodeOutputStreamTest {
     }
 
     @Test
+    @SuppressWarnings("resource")
     public void testConstructorNullStream() throws Exception {
         new BencodeOutputStream(null);
     }
 
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("resource")
     public void testConstructorNullCharset() throws Exception {
         new BencodeOutputStream(out, null);
     }
