@@ -52,7 +52,7 @@ public final class Bencode {
 
     /**
      * Create a new Bencoder using the default {@link Charset} (UTF-8) and useBytes as false.
-     *
+     * 
      * @see #Bencode(Charset, boolean)
      */
     public Bencode() {
@@ -65,7 +65,7 @@ public final class Bencode {
      * @param charset the {@link Charset} to use
      *
      * @throws NullPointerException if the {@link Charset} passed is null
-     *
+     * 
      * @see #Bencode(Charset, boolean)
      */
     public Bencode(final Charset charset) {
@@ -75,8 +75,8 @@ public final class Bencode {
     /**
      * Creates a new Bencoder using the boolean passed to control String parsing.
      *
-     * @param useBytes {@link #Bencode(Charset, boolean)}
-     *
+     * @param useBytes {@link #Bencode(Charset, boolean)} 
+     * 
      * @since 1.3
      */
     public Bencode(final boolean useBytes) {
@@ -85,7 +85,7 @@ public final class Bencode {
 
     /**
      * Creates a new Bencoder using the {@link Charset} passed for encoding/decoding and boolean passed to control String parsing.
-     *
+     * 
      * If useBytes is false, then dictionary values that contain byte string data will be coerced to a {@link String}.
      * if useBytes is true, then dictionary values that contain byte string data will be coerced to a {@link java.nio.ByteBuffer}.
      *
@@ -93,7 +93,7 @@ public final class Bencode {
      * @param useBytes true to have dictionary byte data to stay as bytes
      *
      * @throws NullPointerException if the {@link Charset} passed is null
-     *
+     * 
      * @since 1.3
      */
     public Bencode(final Charset charset, final boolean useBytes) {
