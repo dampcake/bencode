@@ -17,6 +17,7 @@ package com.dampcake.bencode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -176,7 +177,7 @@ public final class Bencode {
     public byte[] encode(final String s) {
         if (s == null) throw new NullPointerException("s cannot be null");
 
-        return encode(s, Type.STRING);
+        return encode(bencode -> bencode.writeString(s));
     }
 
     /**
@@ -194,7 +195,7 @@ public final class Bencode {
     public byte[] encode(final Number n) {
         if (n == null) throw new NullPointerException("n cannot be null");
 
-        return encode(n, Type.NUMBER);
+        return encode(bencode -> bencode.writeNumber(n));
     }
 
     /**
@@ -214,7 +215,7 @@ public final class Bencode {
     public byte[] encode(final Iterable<?> l) {
         if (l == null) throw new NullPointerException("l cannot be null");
 
-        return encode(l, Type.LIST);
+        return encode(bencode -> bencode.writeList(l));
     }
 
     /**
@@ -234,25 +235,23 @@ public final class Bencode {
     public byte[] encode(final Map<?, ?> m) {
         if (m == null) throw new NullPointerException("m cannot be null");
 
-        return encode(m, Type.DICTIONARY);
+        return encode(bencode -> bencode.writeDictionary(m));
     }
 
-    private byte[] encode(final Object o, final Type type) {
+    private byte[] encode(final ThrowingConsumer<BencodeOutputStream> function) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try (BencodeOutputStream bencode = new BencodeOutputStream(out, charset)) {
-            if (type == Type.STRING)
-                bencode.writeString((String) o);
-            else if (type == Type.NUMBER)
-                bencode.writeNumber((Number) o);
-            else if (type == Type.LIST)
-                bencode.writeList((Iterable) o);
-            else if (type == Type.DICTIONARY)
-                bencode.writeDictionary((Map) o);
+            function.accept(bencode);
         } catch (Throwable t) {
             throw new BencodeException("Exception thrown during encoding", t);
         }
 
         return out.toByteArray();
+    }
+
+    @FunctionalInterface
+    public interface ThrowingConsumer<T> {
+        public void accept(T t) throws IOException;
     }
 }
