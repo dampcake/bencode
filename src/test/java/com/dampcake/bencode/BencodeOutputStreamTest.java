@@ -92,8 +92,14 @@ public class BencodeOutputStreamTest {
     }
 
     @Test
-    public void testWriteStringNullByteArray() throws Exception {
+    public void testWriteStringNullByteBuffer() throws Exception {
         assertThrows(NullPointerException.class, () -> instance.writeString((ByteBuffer) null));
+        assertEquals(0, out.toByteArray().length);
+    }
+
+    @Test
+    public void testWriteStringNullByteArray() throws Exception {
+        assertThrows(NullPointerException.class, () -> instance.writeString((byte[]) null));
         assertEquals(0, out.toByteArray().length);
     }
 
