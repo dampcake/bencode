@@ -1,6 +1,6 @@
 # bencode
 
-[![Build Status](https://github.com/dampcake/bencode/workflows/Build/badge.svg?branch=main)](https://github.com/dampcake/bencode/actions?query=branch%3Amain)
+[![Build Status](https://github.com/dampcake/bencode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dampcake/bencode/actions?query=branch%3Amain)
 [![Coverage Status](https://codecov.io/gh/dampcake/bencode/branch/main/graph/badge.svg)](https://codecov.io/gh/dampcake/bencode)
 [![Maven](https://img.shields.io/maven-central/v/com.dampcake/bencode.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.dampcake.bencode)
 [![GitHub license](https://img.shields.io/github/license/dampcake/bencode.svg)](https://github.com/dampcake/bencode/blob/main/LICENSE)
