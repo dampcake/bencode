@@ -2,6 +2,7 @@ package com.dampcake.bencode;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -11,8 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import static com.dampcake.bencode.Assert.assertThrows;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Unit tests for BencodeOutputStream.
@@ -58,12 +59,7 @@ public class BencodeOutputStreamTest {
 
     @Test
     public void testWriteStringNull() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeString((String) null);
-            }
-        });
-
+        assertThrows(NullPointerException.class, () -> instance.writeString((String) null));
         assertEquals(0, out.toByteArray().length);
     }
 
@@ -97,12 +93,7 @@ public class BencodeOutputStreamTest {
 
     @Test
     public void testWriteStringNullByteArray() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeString((ByteBuffer) null);
-            }
-        });
-
+        assertThrows(NullPointerException.class, () -> instance.writeString((ByteBuffer) null));
         assertEquals(0, out.toByteArray().length);
     }
 
@@ -122,12 +113,7 @@ public class BencodeOutputStreamTest {
 
     @Test
     public void testWriteNumberNull() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeNumber(null);
-            }
-        });
-
+        assertThrows(NullPointerException.class, () -> instance.writeNumber(null));
         assertEquals(0, out.toByteArray().length);
     }
 
@@ -155,35 +141,25 @@ public class BencodeOutputStreamTest {
 
     @Test
     public void testWriteListNullItem() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeList(new ArrayList<Object>() {{
-                    add("Hello");
-                    add(ByteBuffer.wrap("World!".getBytes()));
-                    add(new ArrayList<Object>() {{
-                        add(null);
-                        add(456);
-                    }});
-                }});
-            }
-        });
-
+        ThrowingRunnable runnable = () -> instance.writeList(new ArrayList<Object>() {{
+            add("Hello");
+            add(ByteBuffer.wrap("World!".getBytes()));
+            add(new ArrayList<Object>() {{
+                add(null);
+                add(456);
+            }});
+        }});
+        assertThrows(NullPointerException.class, runnable);
         assertEquals(0, out.toByteArray().length);
     }
 
     @Test
     public void testWriteListNull() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeList(null);
-            }
-        });
-
+        assertThrows(NullPointerException.class, () -> instance.writeList(null));
         assertEquals(0, out.toByteArray().length);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testWriteDictionary() throws Exception {
         instance.writeDictionary(new LinkedHashMap<Object, Object>() {{
             put("string", "value");
@@ -192,7 +168,7 @@ public class BencodeOutputStreamTest {
                 add("list-item-1");
                 add("list-item-2");
             }});
-            put("dict", new ConcurrentSkipListMap() {{
+            put("dict", new ConcurrentSkipListMap<Integer, Object>() {{
                 put(123, ByteBuffer.wrap("test".getBytes()));
                 put(456, "thing");
             }});
@@ -211,26 +187,17 @@ public class BencodeOutputStreamTest {
 
     @Test
     public void testWriteDictionaryKeyCastException() throws Exception {
-        assertThrows(ClassCastException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeDictionary(new TreeMap<Object, Object>() {{
-                    put("string", "value");
-                    put(123, "number-key");
-                }});
-            }
-        });
-
+        ThrowingRunnable runnable = () -> instance.writeDictionary(new TreeMap<Object, Object>() {{
+            put("string", "value");
+            put(123, "number-key");
+        }});
+        assertThrows(ClassCastException.class, runnable);
         assertEquals(0, out.toByteArray().length);
     }
 
     @Test
     public void testWriteDictionaryNull() throws Exception {
-        assertThrows(NullPointerException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.writeDictionary(null);
-            }
-        });
-
+        assertThrows(NullPointerException.class, () -> instance.writeDictionary(null));
         assertEquals(0, out.toByteArray().length);
     }
 }
