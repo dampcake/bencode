@@ -9,10 +9,10 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import static com.dampcake.bencode.Assert.assertThrows;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -108,12 +108,7 @@ public class BencodeInputStreamTest {
     public void testReadStringNaN() throws Exception {
         instantiate("1c3:Testing");
 
-        assertThrows(InvalidObjectException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readString();
-            }
-        });
-
+        assertThrows(InvalidObjectException.class, instance::readString);
         assertEquals(10, instance.available());
     }
 
@@ -121,12 +116,7 @@ public class BencodeInputStreamTest {
     public void testReadStringEOF() throws Exception {
         instantiate("123456");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readString();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readString);
         assertEquals(0, instance.available());
     }
 
@@ -134,12 +124,7 @@ public class BencodeInputStreamTest {
     public void testReadStringEmptyStream() throws Exception {
         instantiate("");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readString();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readString);
         assertEquals(0, instance.available());
     }
 
@@ -163,12 +148,7 @@ public class BencodeInputStreamTest {
     public void testReadStringNaNByteArray() throws Exception {
         instantiate("1c3:Testing");
 
-        assertThrows(InvalidObjectException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readStringBytes();
-            }
-        });
-
+        assertThrows(InvalidObjectException.class, instance::readStringBytes);
         assertEquals(10, instance.available());
     }
 
@@ -176,12 +156,7 @@ public class BencodeInputStreamTest {
     public void testReadStringEOFByteArray() throws Exception {
         instantiate("123456");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readStringBytes();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readStringBytes);
         assertEquals(0, instance.available());
     }
 
@@ -189,12 +164,7 @@ public class BencodeInputStreamTest {
     public void testReadStringEmptyStreamByteArray() throws Exception {
         instantiate("");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readStringBytes();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readStringBytes);
         assertEquals(0, instance.available());
     }
 
@@ -210,12 +180,7 @@ public class BencodeInputStreamTest {
     public void testReadNumberNaN() throws Exception {
         instantiate("i123cbve1");
 
-        assertThrows(NumberFormatException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readNumber();
-            }
-        });
-
+        assertThrows(NumberFormatException.class, instance::readNumber);
         assertEquals(1, instance.available());
     }
 
@@ -223,12 +188,7 @@ public class BencodeInputStreamTest {
     public void testReadNumberEOF() throws Exception {
         instantiate("i123");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readNumber();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readNumber);
         assertEquals(0, instance.available());
     }
 
@@ -236,12 +196,7 @@ public class BencodeInputStreamTest {
     public void testReadNumberEmptyStream() throws Exception {
         instantiate("");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readNumber();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readNumber);
         assertEquals(0, instance.available());
     }
 
@@ -304,12 +259,7 @@ public class BencodeInputStreamTest {
     public void testReadListInvalidItem() throws Exception {
         instantiate("l2:Worlde");
 
-        assertThrows(InvalidObjectException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readList();
-            }
-        });
-
+        assertThrows(InvalidObjectException.class, instance::readList);
         assertEquals(4, instance.available());
     }
 
@@ -317,12 +267,7 @@ public class BencodeInputStreamTest {
     public void testReadListEOF() throws Exception {
         instantiate("l5:Hello");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readList();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readList);
         assertEquals(0, instance.available());
     }
 
@@ -393,12 +338,7 @@ public class BencodeInputStreamTest {
     public void testReadDictionaryInvalidItem() throws Exception {
         instantiate("d4:item5:value3:testing");
 
-        assertThrows(InvalidObjectException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readDictionary();
-            }
-        });
-
+        assertThrows(InvalidObjectException.class, instance::readDictionary);
         assertEquals(4, instance.available());
     }
 
@@ -406,12 +346,7 @@ public class BencodeInputStreamTest {
     public void testReadDictionaryEOF() throws Exception {
         instantiate("d4:item5:test");
 
-        assertThrows(EOFException.class, new Runnable() {
-            public void run() throws Exception {
-                instance.readDictionary();
-            }
-        });
-
+        assertThrows(EOFException.class, instance::readDictionary);
         assertEquals(0, instance.available());
     }
 }
