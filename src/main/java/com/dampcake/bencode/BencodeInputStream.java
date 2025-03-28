@@ -256,7 +256,7 @@ public class BencodeInputStream extends FilterInputStream {
 
         if (type == Type.STRING && !useBytes)
             return readString();
-        if (type == Type.STRING && useBytes)
+        if (type == Type.STRING)
             return readStringBytes();
         if (type == Type.NUMBER)
             return readNumber();
