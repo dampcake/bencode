@@ -31,19 +31,6 @@
     <url>https://github.com/dampcake/bencode/issues</url>
   </issueManagement>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <name>Nexus Release Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <developers>
     <developer>
       <id>dampcake</id>
@@ -192,6 +179,16 @@
           <pubScmUrl>scm:git:https://github.com/dampcake/bencode.git</pubScmUrl>
           <!-- branch with static site on github-->
           <scmBranch>gh-pages</scmBranch>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.7.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
         </configuration>
       </plugin>
     </plugins>
