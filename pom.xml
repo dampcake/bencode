@@ -174,7 +174,7 @@
         <configuration>
           <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
           <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
-          <content>${project.reporting.outputDirectory}/apidocs</content>
+          <content>${project.build.directory}/reports/apidocs</content>
           <skipDeletedFiles>true</skipDeletedFiles>
           <pubScmUrl>scm:git:https://github.com/dampcake/bencode.git</pubScmUrl>
           <!-- branch with static site on github-->
